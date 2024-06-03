@@ -4,20 +4,20 @@ import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract.CommonDataKinds.Im
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowInsetsController
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.ViewGroupUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.media3.common.MediaItem
@@ -35,6 +35,7 @@ import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.entities.VideoItemEntity
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
+
 
 class PlayPageActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
@@ -77,7 +78,7 @@ class PlayPageActivity : AppCompatActivity() {
         val fullScreenButton: ImageView = playerView.findViewById(R.id.fullscreen_btn)
         title.text = bundle?.getString("title")
         backButton.setOnClickListener {
-            exitFullScreen()
+            exitFullScreen(playerView)
             fullScreenButton.isSelected = false
             backButton.visibility = View.GONE
         }
@@ -96,10 +97,10 @@ class PlayPageActivity : AppCompatActivity() {
 
         fullScreenButton.setOnClickListener {
             if (fullScreenButton.isSelected) {
-                exitFullScreen()
+                exitFullScreen(playerView)
                 backButton.visibility = View.GONE
             } else {
-                enterFullScreen()
+                enterFullScreen(playerView)
                 backButton.visibility = View.VISIBLE
             }
             fullScreenButton.isSelected = !fullScreenButton.isSelected
@@ -199,7 +200,12 @@ class PlayPageActivity : AppCompatActivity() {
 
     //全屏以及退出全屏
     @RequiresApi(Build.VERSION_CODES.R)
-    private fun enterFullScreen() {
+    private fun enterFullScreen(playerView: PlayerView) {
+        val layoutParams: ViewGroup.LayoutParams = playerView.layoutParams
+        // 设置新的高度
+        layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+        // 重新应用修改后的 LayoutParams
+        playerView.setLayoutParams(layoutParams)
         currentPlaybackPosition = player.currentPosition
         Log.d("ice", currentPlaybackPosition.toString())
         val controller = window.insetsController
@@ -211,7 +217,12 @@ class PlayPageActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    private fun exitFullScreen() {
+    private fun exitFullScreen(playerView: PlayerView) {
+        val layoutParams: ViewGroup.LayoutParams = playerView.layoutParams
+        // 设置新的高度
+        layoutParams.height = (layoutParams.width / 16) * 9
+        // 重新应用修改后的 LayoutParams
+        playerView.setLayoutParams(layoutParams)
         currentPlaybackPosition = player.currentPosition
         Log.d("ice", currentPlaybackPosition.toString())
         val controller = window.insetsController

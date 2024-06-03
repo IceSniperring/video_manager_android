@@ -3,30 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:background="#000000"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".activities.PlayPageActivity">
 
     <androidx.media3.ui.PlayerView
-        app:use_controller="true"
-        app:show_buffering="always"
-        android:background="@drawable/round_bkg"
-        android:clipToOutline="true"
         android:id="@+id/player_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="2dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/round_bkg"
+        android:clipToOutline="true"
+        app:controller_layout_id="@layout/player_controller"
+        app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
-        app:controller_layout_id="@layout/player_controller" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:show_buffering="always"
+        app:use_controller="true" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/video_recommend_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/player_view"
-        android:layout_margin="-1dp"/>
+        android:layout_margin="-1dp"
+        app:layout_constraintTop_toBottomOf="@id/player_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

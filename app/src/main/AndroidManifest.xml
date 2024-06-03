@@ -16,10 +16,13 @@
         android:theme="@style/Theme.My_video_player"
         tools:targetApi="31">
         <activity
+            android:name=".activities.FullScreenActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.PlayPageActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:screenOrientation="fullSensor"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="fullSensor" />
         <activity
             android:name=".activities.MinePageActivity"
             android:exported="false" />
