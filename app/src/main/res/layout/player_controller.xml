@@ -1,0 +1,126 @@
+<!-- res/layout/custom_controller_layout.xml -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/controller_background"
+    android:padding="6dp">
+
+    <ImageView
+        android:padding="10dp"
+        android:id="@+id/back_btn"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:visibility="gone"
+        android:src="@drawable/back"
+        app:layout_constraintTop_toTopOf="@id/exo_text"
+        app:layout_constraintBottom_toBottomOf="@id/exo_text"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:layout_marginStart="5dp"
+        android:id="@+id/exo_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="为美好的世界献上祝福"
+        android:textSize="12sp"
+        android:textColor="#B2000000"
+        app:layout_constraintStart_toEndOf="@id/back_btn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.media3.ui.DefaultTimeBar
+        android:id="@id/exo_progress"
+        android:layout_width="0dp"
+        android:layout_height="16dp"
+        android:layout_marginBottom="4dp"
+        app:bar_height="2dp"
+        app:buffered_color="#8BAAAAAA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/play_or_pause"
+        app:layout_constraintRight_toLeftOf="@id/exo_position"
+        app:played_color="#99EDB0E3"
+        app:scrubber_drawable="@drawable/eevee"
+        app:unplayed_color="#80000000" />
+
+    <TextView
+        android:id="@+id/exo_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:textColor="#CD000000"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/exo_progress"
+        app:layout_constraintLeft_toRightOf="@id/exo_progress"
+        app:layout_constraintRight_toLeftOf="@id/time_divider"
+        app:layout_constraintTop_toTopOf="@id/exo_progress" />
+
+    <TextView
+        android:id="@+id/time_divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="/"
+        android:textColor="#CD000000"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/exo_progress"
+        app:layout_constraintLeft_toRightOf="@id/exo_position"
+        app:layout_constraintRight_toLeftOf="@id/exo_duration"
+        app:layout_constraintTop_toTopOf="@id/exo_progress" />
+
+    <TextView
+        android:id="@id/exo_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:textColor="#CB000000"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/exo_progress"
+        app:layout_constraintLeft_toRightOf="@id/time_divider"
+        app:layout_constraintRight_toLeftOf="@id/fullscreen_btn"
+        app:layout_constraintTop_toTopOf="@id/exo_progress" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/play_or_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/exo_progress"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/exo_progress">
+
+        <ImageView
+            android:id="@+id/exo_play"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:clickable="true"
+            android:src="@drawable/play"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/exo_pause"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:clickable="true"
+            android:src="@drawable/pause"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/fullscreen_btn"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginEnd="5dp"
+        android:src="@drawable/fullscreen_selector"
+        app:layout_constraintBottom_toBottomOf="@id/exo_progress"
+        app:layout_constraintLeft_toRightOf="@id/exo_duration"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/exo_progress" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

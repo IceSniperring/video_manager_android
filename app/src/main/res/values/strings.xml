@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">my_video_player</string>
+    <string name="track_selection_title">字幕</string>
+</resources>
