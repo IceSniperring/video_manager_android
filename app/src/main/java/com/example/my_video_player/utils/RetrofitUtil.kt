@@ -1,14 +1,13 @@
 package com.example.my_video_player.utils
 
-import com.example.my_video_player.interceptors.LoggerInterceptor
-import com.example.my_video_player.interfaces.ApiService
-import com.example.my_video_player.interfaces.CallBackInfo
-
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import com.example.my_video_player.entities.HomePageRandomVideoEntity
+import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.UserEntity
+import com.example.my_video_player.interceptors.LoggerInterceptor
+import com.example.my_video_player.interfaces.ApiService
+import com.example.my_video_player.interfaces.CallBackInfo
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -31,7 +30,7 @@ object RetrofitUtil {
 
     fun getRandomVideo(
         context: Context,
-        callBackInfo: CallBackInfo<HomePageRandomVideoEntity>,
+        callBackInfo: CallBackInfo<VideoEntity>,
         current: Int = 1
     ) {
         val getRandomVideoApi = apiService.getHomeRandomVideo(current)
@@ -43,6 +42,40 @@ object RetrofitUtil {
         getUserInfoApi.enqueue(MyCallback(callBackInfo, context))
     }
 
+    fun getVideoByKind(
+        context: Context,
+        callBackInfo: CallBackInfo<VideoEntity>,
+        kind: String,
+        page: Int = 1
+    ) {
+        val getVideoByKindApi = apiService.getVideoByKind(kind, page)
+        getVideoByKindApi.enqueue(MyCallback(callBackInfo, context))
+    }
+
+    fun getKind(context: Context, callBackInfo: CallBackInfo<List<String>>) {
+        val getKindApi = apiService.getKind()
+        getKindApi.enqueue(object : Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                val responseCode = response.code()
+                if (response.isSuccessful) {
+                    val responseEntity = response.body()
+                    if (responseEntity != null) {
+                        callBackInfo.onSuccess(responseEntity)
+                    } else handler.post {
+                        callBackInfo.onFailure(responseCode, FAILURE_MEG)
+                    }
+                } else handler.post {
+                    callBackInfo.onFailure(responseCode, FAILURE_MEG)
+                }
+            }
+
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+
+            }
+
+        })
+    }
+
     class MyCallback<T>(private val callBackInfo: CallBackInfo<T>, private val context: Context) :
         Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
@@ -51,7 +84,7 @@ object RetrofitUtil {
                 val responseEntity: T? = response.body()
                 if (responseEntity != null) {
                     when (responseEntity) {
-                        is HomePageRandomVideoEntity -> {
+                        is VideoEntity -> {
                             callBackInfo.onSuccess(responseEntity)
                         }
 

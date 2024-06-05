@@ -17,7 +17,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.ViewGroupUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.media3.common.MediaItem
@@ -30,7 +29,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.my_video_player.R
 import com.example.my_video_player.adapters.VideoItemAdapter
-import com.example.my_video_player.entities.HomePageRandomVideoEntity
+import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.entities.VideoItemEntity
 import com.example.my_video_player.interfaces.CallBackInfo
@@ -158,8 +157,8 @@ class PlayPageActivity : AppCompatActivity() {
         videoInfoRecyclerView.layoutManager = GridLayoutManager(this, 2)
         videoInfoRecyclerView.adapter = videoInfoAdapter
 
-        RetrofitUtil.getRandomVideo(this, object : CallBackInfo<HomePageRandomVideoEntity> {
-            override fun onSuccess(data: HomePageRandomVideoEntity) {
+        RetrofitUtil.getRandomVideo(this, object : CallBackInfo<VideoEntity> {
+            override fun onSuccess(data: VideoEntity) {
                 val records = data.records
                 records.forEach {
                     RetrofitUtil.getUserInfo(

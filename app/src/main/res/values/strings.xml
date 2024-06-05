@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">my_video_player</string>
     <string name="track_selection_title">字幕</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
