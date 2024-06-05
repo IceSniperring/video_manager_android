@@ -3,6 +3,8 @@ package com.example.my_video_player.utils
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import com.example.my_video_player.entities.LoginStatusEntity
+import com.example.my_video_player.entities.LoginUserEntity
 import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.interceptors.LoggerInterceptor
@@ -37,7 +39,7 @@ object RetrofitUtil {
         getRandomVideoApi.enqueue(MyCallback(callBackInfo, context))
     }
 
-    fun getUserInfo(context: Context, callBackInfo: CallBackInfo<UserEntity>, id: Long = 1) {
+    fun getUserInfoById(context: Context, callBackInfo: CallBackInfo<UserEntity>, id: Long = 1) {
         val getUserInfoApi = apiService.getUserById(id)
         getUserInfoApi.enqueue(MyCallback(callBackInfo, context))
     }
@@ -76,6 +78,24 @@ object RetrofitUtil {
         })
     }
 
+    fun login(
+        context: Context,
+        callBackInfo: CallBackInfo<LoginStatusEntity>,
+        loginUserEntity: LoginUserEntity
+    ) {
+        val loginApi = apiService.login(loginUserEntity)
+        loginApi.enqueue(MyCallback<LoginStatusEntity>(callBackInfo, context))
+    }
+
+    fun getUserInfoByUsername(
+        context: Context,
+        callBackInfo: CallBackInfo<UserEntity>,
+        username: String
+    ) {
+        val getUserInfoApi = apiService.getUserInfo(username)
+        getUserInfoApi.enqueue(MyCallback(callBackInfo, context))
+    }
+
     class MyCallback<T>(private val callBackInfo: CallBackInfo<T>, private val context: Context) :
         Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
@@ -89,6 +109,10 @@ object RetrofitUtil {
                         }
 
                         is UserEntity -> {
+                            callBackInfo.onSuccess(responseEntity)
+                        }
+
+                        is LoginStatusEntity -> {
                             callBackInfo.onSuccess(responseEntity)
                         }
                     }

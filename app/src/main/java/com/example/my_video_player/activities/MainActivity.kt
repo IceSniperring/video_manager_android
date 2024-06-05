@@ -1,5 +1,6 @@
 package com.example.my_video_player.activities
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
@@ -44,4 +45,5 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
+    
 }

@@ -161,7 +161,7 @@ class PlayPageActivity : AppCompatActivity() {
             override fun onSuccess(data: VideoEntity) {
                 val records = data.records
                 records.forEach {
-                    RetrofitUtil.getUserInfo(
+                    RetrofitUtil.getUserInfoById(
                         this@PlayPageActivity,
                         object : CallBackInfo<UserEntity> {
                             override fun onSuccess(data: UserEntity) {

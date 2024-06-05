@@ -31,7 +31,7 @@ class HomePageFragment : Fragment() {
         val fragmentList: MutableList<Fragment> = mutableListOf()
         fragmentList.add(RecommendPageFragment())
         val homePageAdapter =
-            HomePageAdapter(this.requireActivity().supportFragmentManager, lifecycle, fragmentList)
+            HomePageAdapter(childFragmentManager, lifecycle, fragmentList)
         homePageViewPager.adapter = homePageAdapter
         val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout)
         RetrofitUtil.getKind(requireContext(), object : CallBackInfo<List<String>> {
@@ -40,7 +40,7 @@ class HomePageFragment : Fragment() {
                 val tabNames = mutableListOf("主页")
                 data.forEach {
                     tabNames.add(it)
-                    fragmentList.add(VideoClassFragment(it))
+                    fragmentList.add(VideoClassFragment.newInstance(it))
                 }
 
                 TabLayoutMediator(tabLayout, homePageViewPager) { tab, position ->
@@ -56,6 +56,4 @@ class HomePageFragment : Fragment() {
 
         return view
     }
-
-
 }

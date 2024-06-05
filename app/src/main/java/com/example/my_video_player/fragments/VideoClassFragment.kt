@@ -18,12 +18,27 @@ import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 
-class VideoClassFragment(private val videoClass: String) : Fragment() {
+class VideoClassFragment : Fragment() {
     private val BASE_URL = "http://192.168.31.200:10003"
     private var current = 1
     private lateinit var smartRefreshLayout: SmartRefreshLayout
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
     private lateinit var videoInfoAdapter: VideoItemAdapter
+    companion object {
+        private const val ARG_VIDEO_CLASS = "arg_video_class"
+
+        @JvmStatic
+        fun newInstance(videoClass: String): VideoClassFragment {
+            val fragment = VideoClassFragment()
+            val args = Bundle()
+            args.putString(ARG_VIDEO_CLASS, videoClass)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    private val videoClass: String by lazy { arguments?.getString(ARG_VIDEO_CLASS) ?: "" }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

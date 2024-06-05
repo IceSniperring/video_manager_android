@@ -1,9 +1,13 @@
 package com.example.my_video_player.interfaces
 
+import com.example.my_video_player.entities.LoginStatusEntity
+import com.example.my_video_player.entities.LoginUserEntity
 import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.UserEntity
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ApiService {
@@ -22,4 +26,13 @@ interface ApiService {
         @Query("page") page: Int
     ): Call<VideoEntity>
 
+    @POST("api/login")
+    fun login(
+        @Body loginUserEntity: LoginUserEntity
+    ): Call<LoginStatusEntity>
+
+    @GET("api/getUserInfo")
+    fun getUserInfo(
+        @Query("username") username: String
+    ): Call<UserEntity>
 }
