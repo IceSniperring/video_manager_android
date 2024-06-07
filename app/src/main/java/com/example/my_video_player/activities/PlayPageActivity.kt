@@ -17,23 +17,31 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.utils.widget.ImageFilterView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.my_video_player.R
 import com.example.my_video_player.adapters.VideoItemAdapter
-import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.UserEntity
+import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.VideoItemEntity
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class PlayPageActivity : AppCompatActivity() {
@@ -41,6 +49,7 @@ class PlayPageActivity : AppCompatActivity() {
     val BASE_URL = "http://192.168.31.200:10003"
     private var doubleTapDetector: GestureDetector? = null
     private var currentPlaybackPosition: Long = 0L
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     @RequiresApi(Build.VERSION_CODES.R)
     @OptIn(UnstableApi::class)
@@ -60,6 +69,12 @@ class PlayPageActivity : AppCompatActivity() {
         player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         val bundle = intent.extras
         val playerView = findViewById<PlayerView>(R.id.player_view)
+        val authorImage = findViewById<ImageFilterView>(R.id.author_image)
+        val timeBar = findViewById<DefaultTimeBar>(R.id.time_bar)
+        timeBar.setEnabled(false);
+        Glide.with(this).load(bundle?.getString("authorImage") ?: "").into(authorImage)
+        val authorName = findViewById<TextView>(R.id.author_name)
+        authorName.text = bundle?.getString("authorName")
         val mediaItem = MediaItem.Builder()
             .setUri(bundle?.getString("filePath") ?: "")
             .setMediaMetadata(MediaMetadata.Builder().setTitle("Kono").build())
@@ -68,6 +83,36 @@ class PlayPageActivity : AppCompatActivity() {
         playerView.useController = true
         player.setMediaItem(mediaItem)
         player.prepare()
+        player.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == Player.STATE_READY) {
+                    val duration = player.duration //总时长
+                    val currentPosition = player.currentPosition //当前播放位置
+                    timeBar.setDuration(duration)
+                    timeBar.setPosition(currentPosition)
+                }
+            }
+        })
+        //每秒更新时间
+        coroutineScope.launch(Dispatchers.Main) {
+            while (true) {
+                delay(1000)
+                val duration = player.duration //总时长
+                val currentPosition = player.currentPosition //当前播放位置
+                if (player.isPlaying) {
+                    timeBar.setDuration(duration)
+                    timeBar.setPosition(currentPosition)
+                }
+            }
+        }
+        //控制器是否可视监听器
+        playerView.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
+            if (visibility == View.VISIBLE) {
+                timeBar.visibility = View.GONE
+            } else if (visibility == View.GONE) {
+                timeBar.visibility = View.VISIBLE
+            }
+        })
         player.play()
 
         val title: TextView = playerView.findViewById(R.id.exo_text)

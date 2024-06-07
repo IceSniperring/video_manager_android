@@ -1,6 +1,7 @@
 package com.example.my_video_player.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,7 @@ class VideoClassFragment : Fragment() {
     private lateinit var smartRefreshLayout: SmartRefreshLayout
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
     private lateinit var videoInfoAdapter: VideoItemAdapter
+
     companion object {
         private const val ARG_VIDEO_CLASS = "arg_video_class"
 
@@ -68,7 +70,7 @@ class VideoClassFragment : Fragment() {
                 val records = data.records
                 videoItemEntityList.clear()
                 videoInfoAdapter.notifyDataSetChanged()
-                records.forEach {
+                records.forEachIndexed { index, it ->
                     videoItemEntityList.add(
                         VideoItemEntity(
                             it.id,
@@ -76,10 +78,31 @@ class VideoClassFragment : Fragment() {
                             "$BASE_URL${it.postPath}",
                             "$BASE_URL${it.filePath}",
                             it.uploadDate,
-                            UserEntity(1, "ice", "", "")
+                            UserEntity(1, "", "", "")
                         )
                     )
                     videoInfoAdapter.notifyItemInserted(videoItemEntityList.size)
+                    RetrofitUtil.getUserInfoById(
+                        requireContext(),
+                        object : CallBackInfo<UserEntity> {
+                            override fun onSuccess(data: UserEntity) {
+                                videoItemEntityList[index] = VideoItemEntity(
+                                    it.id,
+                                    it.title,
+                                    "$BASE_URL${it.postPath}",
+                                    "$BASE_URL${it.filePath}",
+                                    it.uploadDate,
+                                    UserEntity(it.uid, data.username, data.avatarPath, data.email)
+                                )
+                                videoInfoAdapter.notifyItemChanged(index)
+                            }
+
+                            override fun onFailure(code: Int, meg: String) {
+
+                            }
+                        },
+                        it.uid,
+                    )
                 }
                 smartRefreshLayout.finishRefresh()
                 current++
@@ -97,7 +120,8 @@ class VideoClassFragment : Fragment() {
                 current++
                 if (current <= data.pages) {
                     val records = data.records
-                    records.forEach {
+                    val nowSize = videoItemEntityList.size
+                    records.forEachIndexed { index, it ->
                         videoItemEntityList.add(
                             VideoItemEntity(
                                 it.id,
@@ -105,10 +129,36 @@ class VideoClassFragment : Fragment() {
                                 "$BASE_URL${it.postPath}",
                                 "$BASE_URL${it.filePath}",
                                 it.uploadDate,
-                                UserEntity(1, "ice", "", "")
+                                UserEntity(1, "", "", "")
                             )
                         )
                         videoInfoAdapter.notifyItemInserted(videoItemEntityList.size)
+                        RetrofitUtil.getUserInfoById(
+                            requireContext(),
+                            object : CallBackInfo<UserEntity> {
+                                override fun onSuccess(data: UserEntity) {
+                                    videoItemEntityList[index + nowSize] = VideoItemEntity(
+                                        it.id,
+                                        it.title,
+                                        "$BASE_URL${it.postPath}",
+                                        "$BASE_URL${it.filePath}",
+                                        it.uploadDate,
+                                        UserEntity(
+                                            it.uid,
+                                            data.username,
+                                            data.avatarPath,
+                                            data.email
+                                        )
+                                    )
+                                    videoInfoAdapter.notifyItemChanged(index + nowSize)
+                                }
+
+                                override fun onFailure(code: Int, meg: String) {
+
+                                }
+                            },
+                            it.uid,
+                        )
                     }
                     smartRefreshLayout.finishLoadMore()
                 } else {

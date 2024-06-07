@@ -12,9 +12,6 @@
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="2dp"
-        android:background="@drawable/round_bkg"
-        android:clipToOutline="true"
         app:controller_layout_id="@layout/player_controller"
         app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,12 +20,48 @@
         app:show_buffering="always"
         app:use_controller="true" />
 
+    <androidx.media3.ui.DefaultTimeBar
+        app:played_color="#99EDB0E3"
+        app:unplayed_color="#80000000"
+        android:id="@+id/time_bar"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/player_view"
+        app:layout_constraintEnd_toEndOf="@id/player_view"
+        app:layout_constraintStart_toStartOf="@id/player_view" />
+
+    <androidx.constraintlayout.utils.widget.ImageFilterView
+        android:id="@+id/author_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player_view"
+        app:round="99999dp" />
+
+    <TextView
+        android:id="@+id/author_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="一个大菠萝"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/author_image"
+        app:layout_constraintStart_toEndOf="@id/author_image"
+        app:layout_constraintTop_toTopOf="@id/author_image" />
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/video_recommend_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="-1dp"
-        app:layout_constraintTop_toBottomOf="@id/player_view"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:layout_marginTop="8dp"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/author_image" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

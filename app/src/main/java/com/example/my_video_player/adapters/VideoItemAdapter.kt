@@ -31,6 +31,8 @@ class VideoItemAdapter(private val videoItemList: MutableList<VideoItemEntity>) 
             val bundle = Bundle()
             bundle.putString("filePath", item.filePath)
             bundle.putString("title", item.title)
+            bundle.putString("authorImage", "http://192.168.31.200:10003${item.user.avatarPath}")
+            bundle.putString("authorName", item.user.username)
             intent.putExtras(bundle)
             context.startActivity(intent)
         }
