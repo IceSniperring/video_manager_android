@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="268dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_background"
+    android:clipToOutline="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/notice_dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="我是一个自定义的Dialog"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/notice_dialog_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:textSize="16sp"
+        android:text="信息"
+        android:textColor="#D5D5D5" />
+
+
+    <TextView
+        android:id="@+id/dialog_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/confirm_background"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="知道了"
+        android:textColor="@color/white" /> <!-- 使用 gravity 将文本对齐到按钮内的右边 -->
+</LinearLayout>

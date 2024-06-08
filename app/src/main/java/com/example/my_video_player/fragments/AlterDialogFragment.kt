@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.my_video_player.R
 
-class MyDialogFragment(
+class AlterDialogFragment(
     private val title: String,
     private val message: String,
     private val onPositiveButtonClickListener: View.OnClickListener,
@@ -17,7 +17,7 @@ class MyDialogFragment(
 ) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = Dialog(requireContext(), R.style.CustomDialog) // 使用自定义样式
-        val view = LayoutInflater.from(context).inflate(R.layout.fragment_my_dialog, null)
+        val view = LayoutInflater.from(context).inflate(R.layout.fragment_alert_dialog, null)
         dialog.setContentView(view)
 
         val titleTextView = view.findViewById<TextView>(R.id.my_dialog_title)
@@ -46,9 +46,5 @@ class MyDialogFragment(
             (268 * resources.displayMetrics.density).toInt(),
             LayoutParams.WRAP_CONTENT
         )
-    }
-
-    fun closeDialog() {
-        dismiss()
     }
 }

@@ -1,25 +1,23 @@
 package com.example.my_video_player.activities
 
-import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.DialogCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.my_video_player.R
-import com.example.my_video_player.fragments.MyDialogFragment
+import com.example.my_video_player.fragments.LoadingDialogFragment
+import com.example.my_video_player.fragments.AlterDialogFragment
+import com.example.my_video_player.fragments.NoticeDialogFragment
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.ConnectTestUtil
-import com.example.my_video_player.utils.RetrofitUtil
 import com.example.my_video_player.utils.URLValidUtil
 import com.tencent.mmkv.MMKV
+import kotlin.system.exitProcess
 
 class ServerInfoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +43,9 @@ class ServerInfoActivity : AppCompatActivity() {
         val resourceAddress: EditText = findViewById(R.id.resource_address)
         val confirmButton: Button = findViewById(R.id.confirm_button)
         confirmButton.setOnClickListener {
+            //加载弹窗
+            val loadingDialogFragment = LoadingDialogFragment("建立连接中...")
+
             var serverAddressString = serverAddress.text.toString()
             var resourceAddressString = resourceAddress.text.toString()
             if (!serverAddressString.contains("://")) {
@@ -61,30 +62,45 @@ class ServerInfoActivity : AppCompatActivity() {
             } else {
                 if (serverAddressString.isNotEmpty() && resourceAddressString.isNotEmpty()) {
                     val message = "后端地址:$serverAddressString\n资源地址:$resourceAddressString"
-                    MyDialogFragment("是否确认服务器信息", message,
+                    AlterDialogFragment("是否确认服务器信息", message,
                         {
+                            loadingDialogFragment.show(supportFragmentManager, "")
                             ConnectTestUtil.testConnect(object : CallBackInfo<List<String>> {
                                 override fun onSuccess(data: List<String>) {
-                                    Toast.makeText(
-                                        this@ServerInfoActivity,
-                                        "服务器连接成功",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                     MMKV.defaultMMKV().encode("serverAddress", serverAddressString)
                                     MMKV.defaultMMKV()
                                         .encode("resourceAddress", resourceAddressString)
-                                    finish()
-                                    val intent =
-                                        Intent(this@ServerInfoActivity, MainActivity::class.java)
-                                    startActivity(intent)
+                                    loadingDialogFragment.dismiss()
+                                    NoticeDialogFragment("连接成功", "恭喜设置成功！") {
+                                        finish()
+                                        if (intent.getBooleanExtra("isReConfig", false)) {
+                                            val intent = Intent(
+                                                this@ServerInfoActivity,
+                                                MainActivity::class.java
+                                            )
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                            startActivity(intent)
+                                            exitProcess(0)
+                                        } else {
+                                            val intent =
+                                                Intent(
+                                                    this@ServerInfoActivity,
+                                                    MainActivity::class.java
+                                                )
+                                            startActivity(intent)
+                                        }
+                                    }.show(
+                                        supportFragmentManager,
+                                        "connect_result"
+                                    )
                                 }
 
                                 override fun onFailure(code: Int, meg: String) {
-                                    Toast.makeText(
-                                        this@ServerInfoActivity,
-                                        meg,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    NoticeDialogFragment("连接失败", "原因:${meg}") {}.show(
+                                        supportFragmentManager,
+                                        "connect_result"
+                                    )
+                                    loadingDialogFragment.dismiss()
                                 }
                             }, serverAddressString)
 

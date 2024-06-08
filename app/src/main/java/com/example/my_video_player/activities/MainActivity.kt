@@ -1,21 +1,17 @@
 package com.example.my_video_player.activities
 
-import android.content.res.Configuration
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.my_video_player.R
 import com.example.my_video_player.adapters.MainActivityAdapter
 import com.example.my_video_player.fragments.HomePageFragment
 import com.example.my_video_player.fragments.MinePageFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationBarView
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

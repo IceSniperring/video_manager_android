@@ -22,7 +22,7 @@
             android:id="@+id/address_config"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="服务器地址设置"
+            android:text="服务器地址设置（需要重启）"
             android:textColor="@color/white"
             app:layout_constraintEnd_toStartOf="@id/right_arrow_address"
             app:layout_constraintStart_toStartOf="parent"
