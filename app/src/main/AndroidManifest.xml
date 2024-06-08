@@ -17,10 +17,16 @@
         android:theme="@style/Theme.My_video_player"
         tools:targetApi="31">
         <activity
+            android:name=".activities.ConfigActivity"
+            android:launchMode="singleTask"
+            android:exported="false" />
+        <activity
             android:name=".activities.MainActivity"
+            android:launchMode="singleTask"
             android:exported="false" />
         <activity
             android:name=".activities.LoginPageActivity"
+            android:launchMode="singleTask"
             android:exported="false" />
         <activity
             android:name=".activities.PlayPageActivity"
@@ -30,6 +36,7 @@
         <activity
             android:name=".activities.ServerInfoActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
+            android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

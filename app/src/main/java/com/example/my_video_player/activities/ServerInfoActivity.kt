@@ -34,9 +34,11 @@ class ServerInfoActivity : AppCompatActivity() {
         if (MMKV.defaultMMKV().decodeString("serverAddress") != null && MMKV.defaultMMKV()
                 .decodeString("resourceAddress") != null
         ) {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+            if (!intent.getBooleanExtra("isReConfig", false)) {
+                finish()
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
         }
 
         val serverAddress: EditText = findViewById(R.id.server_address)
@@ -71,10 +73,10 @@ class ServerInfoActivity : AppCompatActivity() {
                                     MMKV.defaultMMKV().encode("serverAddress", serverAddressString)
                                     MMKV.defaultMMKV()
                                         .encode("resourceAddress", resourceAddressString)
+                                    finish()
                                     val intent =
                                         Intent(this@ServerInfoActivity, MainActivity::class.java)
                                     startActivity(intent)
-                                    finish()
                                 }
 
                                 override fun onFailure(code: Int, meg: String) {

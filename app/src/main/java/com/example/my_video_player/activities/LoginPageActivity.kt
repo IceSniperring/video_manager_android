@@ -69,10 +69,10 @@ class LoginPageActivity : AppCompatActivity() {
                                     MMKV.defaultMMKV().encode("username", data.username)
                                     MMKV.defaultMMKV().encode("avatar", data.avatarPath)
                                     MMKV.defaultMMKV().encode("uid", data.id)
+                                    finish()
                                     val intent =
                                         Intent(this@LoginPageActivity, MainActivity::class.java)
                                     startActivity(intent)
-                                    finish()
                                 }
 
                                 override fun onFailure(code: Int, meg: String) {
