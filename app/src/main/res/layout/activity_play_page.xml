@@ -21,15 +21,16 @@
         app:use_controller="true" />
 
     <androidx.media3.ui.DefaultTimeBar
-        app:played_color="#99EDB0E3"
-        app:unplayed_color="#80000000"
         android:id="@+id/time_bar"
         android:layout_width="0dp"
         android:layout_height="2dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginStart="-8dp"
+        android:layout_marginEnd="-8dp"
         app:layout_constraintBottom_toBottomOf="@id/player_view"
         app:layout_constraintEnd_toEndOf="@id/player_view"
-        app:layout_constraintStart_toStartOf="@id/player_view" />
+        app:layout_constraintStart_toStartOf="@id/player_view"
+        app:played_color="#FB9AEC"
+        app:unplayed_color="#80000000" />
 
     <androidx.constraintlayout.utils.widget.ImageFilterView
         android:id="@+id/author_image"

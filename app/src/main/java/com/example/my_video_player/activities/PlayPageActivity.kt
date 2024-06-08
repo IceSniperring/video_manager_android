@@ -38,6 +38,7 @@ import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.VideoItemEntity
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
+import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -46,7 +47,8 @@ import kotlinx.coroutines.launch
 
 class PlayPageActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
-    val BASE_URL = "http://192.168.31.200:10003"
+    private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
+    private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
     private var doubleTapDetector: GestureDetector? = null
     private var currentPlaybackPosition: Long = 0L
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -105,14 +107,6 @@ class PlayPageActivity : AppCompatActivity() {
                 }
             }
         }
-        //控制器是否可视监听器
-        playerView.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
-            if (visibility == View.VISIBLE) {
-                timeBar.visibility = View.GONE
-            } else if (visibility == View.GONE) {
-                timeBar.visibility = View.VISIBLE
-            }
-        })
         player.play()
 
         val title: TextView = playerView.findViewById(R.id.exo_text)
@@ -146,9 +140,23 @@ class PlayPageActivity : AppCompatActivity() {
             } else {
                 enterFullScreen(playerView)
                 backButton.visibility = View.VISIBLE
+                timeBar.visibility = View.GONE
             }
             fullScreenButton.isSelected = !fullScreenButton.isSelected
         }
+
+        //控制器是否可视监听器
+        playerView.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
+            if (visibility == View.VISIBLE) {
+                if (!fullScreenButton.isSelected) {
+                    timeBar.visibility = View.GONE
+                }
+            } else if (visibility == View.GONE) {
+                if (!fullScreenButton.isSelected) {
+                    timeBar.visibility = View.VISIBLE
+                }
+            }
+        })
 
         doubleTapDetector =
             GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {

@@ -72,6 +72,7 @@ class LoginPageActivity : AppCompatActivity() {
                                     val intent =
                                         Intent(this@LoginPageActivity, MainActivity::class.java)
                                     startActivity(intent)
+                                    finish()
                                 }
 
                                 override fun onFailure(code: Int, meg: String) {

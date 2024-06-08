@@ -14,9 +14,12 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.example.my_video_player.R
 import com.example.my_video_player.activities.PlayPageActivity
 import com.example.my_video_player.entities.VideoItemEntity
+import com.tencent.mmkv.MMKV
 
 class VideoItemAdapter(private val videoItemList: MutableList<VideoItemEntity>) :
     BaseQuickAdapter<VideoItemEntity, BaseViewHolder>(R.layout.video_item, videoItemList) {
+    private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
+    private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
     override fun convert(holder: BaseViewHolder, item: VideoItemEntity) {
         val poster = holder.getView<ImageFilterView>(R.id.poster)
         Glide.with(context).load(item.postPath).into(poster)
@@ -31,7 +34,7 @@ class VideoItemAdapter(private val videoItemList: MutableList<VideoItemEntity>) 
             val bundle = Bundle()
             bundle.putString("filePath", item.filePath)
             bundle.putString("title", item.title)
-            bundle.putString("authorImage", "http://192.168.31.200:10003${item.user.avatarPath}")
+            bundle.putString("authorImage", "$BASE_URL${item.user.avatarPath}")
             bundle.putString("authorName", item.user.username)
             intent.putExtras(bundle)
             context.startActivity(intent)

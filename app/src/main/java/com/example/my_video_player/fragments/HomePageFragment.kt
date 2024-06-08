@@ -4,22 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.my_video_player.R
 import com.example.my_video_player.adapters.HomePageAdapter
-import com.example.my_video_player.adapters.VideoItemAdapter
-import com.example.my_video_player.entities.UserEntity
-import com.example.my_video_player.entities.VideoEntity
-import com.example.my_video_player.entities.VideoItemEntity
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.scwang.smart.refresh.layout.SmartRefreshLayout
 
 class HomePageFragment : Fragment() {
     override fun onCreateView(

@@ -17,9 +17,11 @@ import com.example.my_video_player.entities.VideoItemEntity
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
+import com.tencent.mmkv.MMKV
 
 class RecommendPageFragment : Fragment() {
-    private val BASE_URL = "http://192.168.31.200:10003"
+    private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
+    private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
     private var current = 1
     private lateinit var smartRefreshLayout: SmartRefreshLayout
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
@@ -29,9 +31,12 @@ class RecommendPageFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_recommend_page, container, false)
+        return inflater.inflate(R.layout.fragment_recommend_page, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupViews(view)
-        return view
     }
 
     private fun setupViews(view: View) {

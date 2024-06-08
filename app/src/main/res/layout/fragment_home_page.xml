@@ -7,7 +7,11 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
-        app:tabMaxWidth="200dp"
+        app:tabMode="scrollable"
+        app:tabIndicatorHeight="2dp"
+        app:tabIndicatorColor="#FB9AEC"
+        app:tabSelectedTextColor="#FB9AEC"
+        app:tabIndicator="@drawable/tab_indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/black"

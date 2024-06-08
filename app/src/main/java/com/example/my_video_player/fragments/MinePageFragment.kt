@@ -19,7 +19,8 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 class MinePageFragment : Fragment() {
-    private val BASE_URL = "http://192.168.31.200:10003"
+    private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
+    private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
     private lateinit var avatar: ImageFilterView
     private lateinit var username: TextView
     private lateinit var uid: TextView
@@ -52,7 +53,9 @@ class MinePageFragment : Fragment() {
 
         logout.setOnClickListener {
             Toast.makeText(requireContext(), "已退出登录", Toast.LENGTH_SHORT).show()
-            MMKV.defaultMMKV().clearAll()
+            MMKV.defaultMMKV().removeValueForKey("username")
+            MMKV.defaultMMKV().removeValueForKey("avatar")
+            MMKV.defaultMMKV().removeValueForKey("uid")
             avatar.isEnabled = true
             avatar.setImageResource(R.color.white)
             username.text = "未登录"

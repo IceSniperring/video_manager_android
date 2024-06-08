@@ -10,6 +10,7 @@ import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.interceptors.LoggerInterceptor
 import com.example.my_video_player.interfaces.ApiService
 import com.example.my_video_player.interfaces.CallBackInfo
+import com.tencent.mmkv.MMKV
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,9 +19,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitUtil {
-    private const val BASE_URL = "http://192.168.31.200:10001"
+    private val serverAddress = MMKV.defaultMMKV().decodeString("serverAddress")
+    private val BASE_URL = serverAddress ?: "http://192.168.31.200:10003"
     private val okHttpClient = OkHttpClient.Builder().addInterceptor(LoggerInterceptor()).build()
-    private val retrofit = Retrofit.Builder()
+    private var retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
@@ -28,7 +30,6 @@ object RetrofitUtil {
     private val handler = Handler(Looper.getMainLooper())
     private val apiService = retrofit.create(ApiService::class.java)
     private const val FAILURE_MEG = "请求失败"
-
 
     fun getRandomVideo(
         context: Context,
@@ -72,9 +73,8 @@ object RetrofitUtil {
             }
 
             override fun onFailure(call: Call<List<String>>, t: Throwable) {
-
+                callBackInfo.onFailure(-1, FAILURE_MEG)
             }
-
         })
     }
 
