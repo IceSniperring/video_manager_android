@@ -122,7 +122,6 @@ class VideoClassFragment : Fragment() {
         RetrofitUtil.getVideoByKind(requireContext(), object :
             CallBackInfo<VideoEntity> {
             override fun onSuccess(data: VideoEntity) {
-                current++
                 if (current <= data.pages) {
                     val records = data.records
                     val nowSize = videoItemEntityList.size
@@ -165,10 +164,10 @@ class VideoClassFragment : Fragment() {
                             it.uid,
                         )
                     }
+                    current++
                     smartRefreshLayout.finishLoadMore()
                 } else {
                     Toast.makeText(requireContext(), "无更多视频", Toast.LENGTH_SHORT).show()
-                    current--
                     smartRefreshLayout.finishLoadMore()
                 }
             }
