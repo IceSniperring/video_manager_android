@@ -22,6 +22,7 @@ class LoadingDialogFragment(private val loadingText: String) : DialogFragment() 
         loadingIcon = view.findViewById<ImageView>(R.id.loading_icon)
         animation = AnimationUtils.loadAnimation(requireContext(), R.anim.rotate_loading)
         loadingIcon.startAnimation(animation)
+        dialog.setCanceledOnTouchOutside(false  )
         return dialog
     }
 

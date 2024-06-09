@@ -34,8 +34,8 @@
 
     <androidx.constraintlayout.utils.widget.ImageFilterView
         android:id="@+id/author_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:background="@color/white"
@@ -54,15 +54,45 @@
         app:layout_constraintStart_toEndOf="@id/author_image"
         app:layout_constraintTop_toTopOf="@id/author_image" />
 
+    <TextView
+        android:id="@+id/video_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="为美好的世界献上祝福"
+        app:layout_constraintTop_toBottomOf="@id/author_image" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/video_recommend_recycler_view"
+    <TextView
+        android:id="@+id/upload_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="2023-03-14 03:34:41"
+        android:textSize="8sp"
+        app:layout_constraintStart_toStartOf="@id/video_title"
+        app:layout_constraintTop_toBottomOf="@id/video_title" />
+
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/player_page_refresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="-1dp"
-        android:layout_marginTop="8dp"
-        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/author_image" />
+        app:layout_constraintTop_toBottomOf="@id/upload_date">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/video_recommend_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="-1dp"
+            android:layout_marginTop="8dp"
+            android:padding="10dp" />
+
+        <com.scwang.smart.refresh.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

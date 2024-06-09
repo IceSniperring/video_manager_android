@@ -2,10 +2,7 @@ package com.example.my_video_player.adapters
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Telephony.Mms.Intents
-import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.utils.widget.ImageFilterView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
@@ -16,8 +13,11 @@ import com.example.my_video_player.activities.PlayPageActivity
 import com.example.my_video_player.entities.VideoItemEntity
 import com.tencent.mmkv.MMKV
 
-class VideoItemAdapter(private val videoItemList: MutableList<VideoItemEntity>) :
-    BaseQuickAdapter<VideoItemEntity, BaseViewHolder>(R.layout.video_item, videoItemList) {
+class PlayerPageVideoItemAdapter(videoItemList: MutableList<VideoItemEntity>) :
+    BaseQuickAdapter<VideoItemEntity, BaseViewHolder>(
+        R.layout.player_page_video_item,
+        videoItemList
+    ) {
     private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
     private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
     override fun convert(holder: BaseViewHolder, item: VideoItemEntity) {
@@ -25,10 +25,10 @@ class VideoItemAdapter(private val videoItemList: MutableList<VideoItemEntity>) 
         Glide.with(context).load(item.postPath).into(poster)
         val title = holder.getView<TextView>(R.id.title)
         title.text = item.title
-        val username = holder.getView<TextView>(R.id.author)
+        val username = holder.getView<TextView>(R.id.username)
         username.text = item.user.username
 
-        val videoItem = holder.getView<ConstraintLayout>(R.id.video_item)
+        val videoItem = holder.getView<ConstraintLayout>(R.id.play_page_video_item)
         videoItem.setOnClickListener {
             val intent = Intent(context, PlayPageActivity::class.java)
             val bundle = Bundle()

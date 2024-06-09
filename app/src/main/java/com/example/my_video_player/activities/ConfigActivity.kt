@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.my_video_player.R
 import com.example.my_video_player.eventsEntities.LogoutEventEntity
+import com.example.my_video_player.fragments.NoticeDialogFragment
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 
@@ -38,7 +39,10 @@ class ConfigActivity : AppCompatActivity() {
             if (MMKV.defaultMMKV().decodeString("username") == null) View.VISIBLE else View.GONE
         logoutConfig.setOnClickListener {
             EventBus.getDefault().post(LogoutEventEntity())
-            Toast.makeText(this, "退出登陆成功", Toast.LENGTH_SHORT).show()
+            NoticeDialogFragment("退出登陆成功", "已退出登录，期待你再次回来!") {}.show(
+                supportFragmentManager,
+                "noticeDialogFragment"
+            )
             loginConfig.visibility = View.VISIBLE
             logoutConfig.visibility = View.GONE
         }

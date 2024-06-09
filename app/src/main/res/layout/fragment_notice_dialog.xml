@@ -13,7 +13,7 @@
         android:layout_margin="20dp"
         android:text="我是一个自定义的Dialog"
         android:textColor="#FFFFFF"
-        android:textSize="18sp" />
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/notice_dialog_message"
@@ -22,7 +22,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:textSize="16sp"
+        android:textSize="12sp"
         android:text="信息"
         android:textColor="#D5D5D5" />
 

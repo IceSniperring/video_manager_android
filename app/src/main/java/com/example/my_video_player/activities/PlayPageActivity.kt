@@ -32,12 +32,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.my_video_player.R
+import com.example.my_video_player.adapters.PlayerPageVideoItemAdapter
 import com.example.my_video_player.adapters.VideoItemAdapter
 import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.VideoItemEntity
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
+import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +54,10 @@ class PlayPageActivity : AppCompatActivity() {
     private var doubleTapDetector: GestureDetector? = null
     private var currentPlaybackPosition: Long = 0L
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private var current = 1
+    private lateinit var smartRefreshLayout: SmartRefreshLayout
+    private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
+    private lateinit var videoInfoAdapter: PlayerPageVideoItemAdapter
 
     @RequiresApi(Build.VERSION_CODES.R)
     @OptIn(UnstableApi::class)
@@ -77,6 +83,10 @@ class PlayPageActivity : AppCompatActivity() {
         Glide.with(this).load(bundle?.getString("authorImage") ?: "").into(authorImage)
         val authorName = findViewById<TextView>(R.id.author_name)
         authorName.text = bundle?.getString("authorName")
+        val videoTitle = findViewById<TextView>(R.id.video_title)
+        videoTitle.text = bundle?.getString("title")
+        val uploadDate = findViewById<TextView>(R.id.upload_date)
+        uploadDate.text = bundle?.getString("uploadDate")
         val mediaItem = MediaItem.Builder()
             .setUri(bundle?.getString("filePath") ?: "")
             .setMediaMetadata(MediaMetadata.Builder().setTitle("Kono").build())
@@ -204,43 +214,15 @@ class PlayPageActivity : AppCompatActivity() {
         //关闭动画
         playerView.setControllerAnimationEnabled(false)
 
-        val videoItemEntityEntityList: MutableList<VideoItemEntity> = mutableListOf()
         val videoInfoRecyclerView = findViewById<RecyclerView>(R.id.video_recommend_recycler_view)
-        val videoInfoAdapter = VideoItemAdapter(videoItemEntityEntityList)
-        videoInfoRecyclerView.layoutManager = GridLayoutManager(this, 2)
+        videoInfoAdapter = PlayerPageVideoItemAdapter(videoItemEntityList)
+        videoInfoRecyclerView.layoutManager = GridLayoutManager(this, 1)
         videoInfoRecyclerView.adapter = videoInfoAdapter
-
-        RetrofitUtil.getRandomVideo(this, object : CallBackInfo<VideoEntity> {
-            override fun onSuccess(data: VideoEntity) {
-                val records = data.records
-                records.forEach {
-                    RetrofitUtil.getUserInfoById(
-                        this@PlayPageActivity,
-                        object : CallBackInfo<UserEntity> {
-                            override fun onSuccess(data: UserEntity) {
-                                videoItemEntityEntityList.add(
-                                    VideoItemEntity(
-                                        it.id,
-                                        it.title,
-                                        "${BASE_URL}${it.postPath}",
-                                        "${BASE_URL}${it.filePath}",
-                                        it.uploadDate,
-                                        data
-                                    )
-                                )
-                                videoInfoAdapter.notifyItemInserted(videoItemEntityEntityList.size)
-                            }
-
-                            override fun onFailure(code: Int, meg: String) {}
-                        },
-                        it.uid
-                    )
-                }
-            }
-
-            override fun onFailure(code: Int, meg: String) {
-            }
-        }, 1)
+        smartRefreshLayout = findViewById<SmartRefreshLayout>(R.id.player_page_refresh)
+        smartRefreshLayout.setOnLoadMoreListener {
+            loadMore()
+        }
+        loadMore()
     }
 
     //滑动手势
@@ -311,5 +293,53 @@ class PlayPageActivity : AppCompatActivity() {
     override fun onRestart() {
         super.onRestart()
         player.play()
+    }
+
+    private fun loadMore() {
+        RetrofitUtil.getRandomVideo(this, object :
+            CallBackInfo<VideoEntity> {
+            override fun onSuccess(data: VideoEntity) {
+                current++
+                val records = data.records
+                val nowSize = videoItemEntityList.size
+                records.forEachIndexed { index, it ->
+                    videoItemEntityList.add(
+                        VideoItemEntity(
+                            it.id,
+                            it.title,
+                            "$BASE_URL${it.postPath}",
+                            "$BASE_URL${it.filePath}",
+                            it.uploadDate,
+                            UserEntity(1, "", "", "")
+                        )
+                    )
+                    videoInfoAdapter.notifyItemInserted(videoItemEntityList.size)
+                    RetrofitUtil.getUserInfoById(
+                        this@PlayPageActivity,
+                        object : CallBackInfo<UserEntity> {
+                            override fun onSuccess(data: UserEntity) {
+                                videoItemEntityList[index + nowSize] = VideoItemEntity(
+                                    it.id,
+                                    it.title,
+                                    "$BASE_URL${it.postPath}",
+                                    "$BASE_URL${it.filePath}",
+                                    it.uploadDate,
+                                    UserEntity(it.uid, data.username, data.avatarPath, data.email)
+                                )
+                                videoInfoAdapter.notifyItemChanged(index + nowSize)
+                            }
+
+                            override fun onFailure(code: Int, meg: String) {
+
+                            }
+                        },
+                        it.uid,
+                    )
+                }
+                smartRefreshLayout.finishLoadMore()
+            }
+
+            override fun onFailure(code: Int, msg: String) {}
+        }, current)
     }
 }

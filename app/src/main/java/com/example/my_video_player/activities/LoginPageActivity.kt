@@ -17,6 +17,8 @@ import com.example.my_video_player.entities.LoginStatusEntity
 import com.example.my_video_player.entities.LoginUserEntity
 import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.eventsEntities.LoginEventEntity
+import com.example.my_video_player.fragments.LoadingDialogFragment
+import com.example.my_video_player.fragments.NoticeDialogFragment
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RSAEncrypt
 import com.example.my_video_player.utils.RetrofitUtil
@@ -49,34 +51,46 @@ class LoginPageActivity : AppCompatActivity() {
     }
 
     fun login(loginUserEntity: LoginUserEntity) {
+        val loadingDialogFragment = LoadingDialogFragment("登陆中")
+        loadingDialogFragment.show(
+            supportFragmentManager,
+            "loadingDialogFragment"
+        )
         RetrofitUtil.login(this@LoginPageActivity, object : CallBackInfo<LoginStatusEntity> {
             override fun onSuccess(data: LoginStatusEntity) {
                 if (data.success) {
                     if (data.code == 1) {
-                        Toast.makeText(this@LoginPageActivity, "登录成功", Toast.LENGTH_SHORT)
-                            .show()
                         RetrofitUtil.getUserInfoByUsername(
                             this@LoginPageActivity,
                             object : CallBackInfo<UserEntity> {
                                 override fun onSuccess(data: UserEntity) {
-                                    EventBus.getDefault().postSticky(
-                                        LoginEventEntity(
-                                            data.username,
-                                            data.avatarPath,
-                                            data.id
+                                    loadingDialogFragment.dismiss()
+                                    NoticeDialogFragment("登陆成功", "登陆成功，欢迎回来!") {
+                                        EventBus.getDefault().postSticky(
+                                            LoginEventEntity(
+                                                data.username,
+                                                data.avatarPath,
+                                                data.id
+                                            )
                                         )
+                                        MMKV.defaultMMKV().encode("username", data.username)
+                                        MMKV.defaultMMKV().encode("avatar", data.avatarPath)
+                                        MMKV.defaultMMKV().encode("uid", data.id)
+                                        finish()
+                                        val intent =
+                                            Intent(this@LoginPageActivity, MainActivity::class.java)
+                                        startActivity(intent)
+                                    }.show(
+                                        supportFragmentManager,
+                                        "noticeDialogFragment"
                                     )
-                                    MMKV.defaultMMKV().encode("username", data.username)
-                                    MMKV.defaultMMKV().encode("avatar", data.avatarPath)
-                                    MMKV.defaultMMKV().encode("uid", data.id)
-                                    finish()
-                                    val intent =
-                                        Intent(this@LoginPageActivity, MainActivity::class.java)
-                                    startActivity(intent)
                                 }
 
                                 override fun onFailure(code: Int, meg: String) {
-
+                                    loadingDialogFragment.dismiss()
+                                    NoticeDialogFragment("错误", "code:$code\n meg:$meg") {}.show(
+                                        supportFragmentManager, "network_error"
+                                    )
                                 }
 
                             },
@@ -84,21 +98,28 @@ class LoginPageActivity : AppCompatActivity() {
                         )
                     }
                 } else {
+                    loadingDialogFragment.dismiss()
                     if (data.code == 2) {
-                        Toast.makeText(this@LoginPageActivity, "密码错误", Toast.LENGTH_SHORT)
-                            .show()
+                        NoticeDialogFragment("密码错误", "密码错误，请重新输入") {}.show(
+                            supportFragmentManager, "password_error"
+                        )
                     } else if (data.code == 3) {
-                        Toast.makeText(this@LoginPageActivity, "用户不存在", Toast.LENGTH_SHORT)
-                            .show()
+                        NoticeDialogFragment("用户不存在", "用户不存在，请重新输入") {}.show(
+                            supportFragmentManager, "user_error"
+                        )
                     } else if (data.code == 4) {
-                        Toast.makeText(this@LoginPageActivity, "未知错误", Toast.LENGTH_SHORT)
-                            .show()
+                        NoticeDialogFragment("未知错误", "未知错误！！！！") {}.show(
+                            supportFragmentManager, "unknown_error"
+                        )
                     }
                 }
             }
 
             override fun onFailure(code: Int, meg: String) {
-
+                loadingDialogFragment.dismiss()
+                NoticeDialogFragment("错误", "code:$code\nmeg:$meg") {}.show(
+                    supportFragmentManager, "network_error"
+                )
             }
 
         }, loginUserEntity)
