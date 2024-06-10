@@ -25,4 +25,11 @@
         <!-- 添加其他自定义属性 -->
     </style>
 
+    <style name="blurDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@drawable/round_bkg</item>
+        <item name="android:layout_width">268dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <!-- 添加其他自定义属性 -->
+    </style>
+
 </resources>

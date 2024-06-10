@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="268dp"
     android:layout_height="wrap_content"
-    android:background="@drawable/dialog_background"
-    android:clipToOutline="true"
     android:orientation="vertical">
+
+    <net.center.blurview.ShapeBlurView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:blur_corner_radius="16dp"
+        app:blur_overlay_color="#D87C7C7C"
+        app:blur_radius="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/notice_dialog_title"
@@ -13,28 +21,42 @@
         android:layout_margin="20dp"
         android:text="我是一个自定义的Dialog"
         android:textColor="#FFFFFF"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/notice_dialog_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:textSize="12sp"
+        android:layout_margin="20dp"
         android:text="信息"
-        android:textColor="#D5D5D5" />
+        android:textColor="#D5D5D5"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notice_dialog_title" />
 
+
+    <net.center.blurview.ShapeBlurView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:blur_corner_radius_bottom_left="16dp"
+        app:blur_corner_radius_bottom_right="16dp"
+        app:blur_overlay_color="#BE55C8F6"
+        app:blur_radius="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/dialog_button"
+        app:layout_constraintTop_toTopOf="@id/dialog_button" />
 
     <TextView
         android:id="@+id/dialog_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:layout_weight="1"
-        android:background="@drawable/confirm_background"
+        android:background="@drawable/ripple_effect"
         android:gravity="center"
         android:padding="16dp"
         android:text="知道了"
-        android:textColor="@color/white" /> <!-- 使用 gravity 将文本对齐到按钮内的右边 -->
-</LinearLayout>
+        android:textColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/notice_dialog_message" /> <!-- 使用 gravity 将文本对齐到按钮内的右边 -->
+</androidx.constraintlayout.widget.ConstraintLayout>

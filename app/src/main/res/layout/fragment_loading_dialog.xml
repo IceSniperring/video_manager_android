@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="120dp"
     android:layout_height="120dp">
+
+    <net.center.blurview.ShapeBlurView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:blur_corner_radius="16dp"
+        app:blur_overlay_color="#D87C7C7C"
+        app:blur_radius="20dp" />
 
     <ImageView
         android:id="@+id/loading_icon"

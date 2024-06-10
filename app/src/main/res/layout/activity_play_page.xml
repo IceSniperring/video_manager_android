@@ -33,6 +33,7 @@
         app:unplayed_color="#80000000" />
 
     <androidx.constraintlayout.utils.widget.ImageFilterView
+        android:scaleType="centerCrop"
         android:id="@+id/author_image"
         android:layout_width="40dp"
         android:layout_height="40dp"
