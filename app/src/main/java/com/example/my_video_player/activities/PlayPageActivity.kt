@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -52,12 +53,12 @@ class PlayPageActivity : AppCompatActivity() {
     private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
     private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
     private var doubleTapDetector: GestureDetector? = null
-    private var currentPlaybackPosition: Long = 0L
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var current = 1
     private lateinit var smartRefreshLayout: SmartRefreshLayout
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
     private lateinit var videoInfoAdapter: PlayerPageVideoItemAdapter
+    private var isFullScreen = false
 
     @RequiresApi(Build.VERSION_CODES.R)
     @OptIn(UnstableApi::class)
@@ -240,14 +241,8 @@ class PlayPageActivity : AppCompatActivity() {
         layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         // 重新应用修改后的 LayoutParams
         playerView.setLayoutParams(layoutParams)
-        currentPlaybackPosition = player.currentPosition
-        Log.d("ice", currentPlaybackPosition.toString())
-        val controller = window.insetsController
-        controller?.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-        controller?.systemBarsBehavior =
-            WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        player.seekTo(currentPlaybackPosition)
+        isFullScreen = true
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -257,27 +252,26 @@ class PlayPageActivity : AppCompatActivity() {
         layoutParams.height = (layoutParams.width / 16) * 9
         // 重新应用修改后的 LayoutParams
         playerView.setLayoutParams(layoutParams)
-        currentPlaybackPosition = player.currentPosition
-        Log.d("ice", currentPlaybackPosition.toString())
-        val controller = window.insetsController
-        controller?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        player.seekTo(currentPlaybackPosition)
+        isFullScreen = false
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            val controller = window.insetsController
-            controller?.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-            controller?.systemBarsBehavior =
-                WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            val controller = window.insetsController
-            controller?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (isFullScreen) {
+                window.insetsController!!.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+            } else {
+                window.insetsController!!.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+            }
+        } else {
+            if (isFullScreen) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
         }
-        player.seekTo(currentPlaybackPosition)
     }
 
     override fun onDestroy() {

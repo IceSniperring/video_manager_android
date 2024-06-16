@@ -31,8 +31,7 @@
         <activity
             android:name=".activities.PlayPageActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:exported="false"
-            android:screenOrientation="fullSensor" />
+            android:exported="false" />
         <activity
             android:name=".activities.ServerInfoActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
