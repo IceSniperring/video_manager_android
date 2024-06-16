@@ -7,24 +7,26 @@
     android:padding="6dp">
 
     <ImageView
-        android:padding="10dp"
         android:id="@+id/back_btn"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:visibility="gone"
+        android:padding="10dp"
         android:src="@drawable/back"
-        app:layout_constraintTop_toTopOf="@id/exo_text"
         app:layout_constraintBottom_toBottomOf="@id/exo_text"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/exo_text" />
 
     <TextView
-        android:layout_marginStart="5dp"
         android:id="@+id/exo_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:ellipsize="end"
+        android:maxWidth="220dp"
+        android:maxLines="1"
         android:text="为美好的世界献上祝福"
-        android:textSize="12sp"
         android:textColor="#B2000000"
+        android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@id/back_btn"
         app:layout_constraintTop_toTopOf="parent" />
 

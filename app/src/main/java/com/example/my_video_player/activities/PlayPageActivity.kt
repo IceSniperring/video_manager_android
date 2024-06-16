@@ -14,6 +14,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
@@ -127,9 +128,12 @@ class PlayPageActivity : AppCompatActivity() {
         val fullScreenButton: ImageView = playerView.findViewById(R.id.fullscreen_btn)
         title.text = bundle?.getString("title")
         backButton.setOnClickListener {
-            exitFullScreen(playerView)
-            fullScreenButton.isSelected = false
-            backButton.visibility = View.GONE
+            if (isFullScreen) {
+                exitFullScreen(playerView)
+                fullScreenButton.isSelected = false
+            } else {
+                finish()
+            }
         }
 
         playButton.setOnClickListener {
@@ -147,10 +151,8 @@ class PlayPageActivity : AppCompatActivity() {
         fullScreenButton.setOnClickListener {
             if (fullScreenButton.isSelected) {
                 exitFullScreen(playerView)
-                backButton.visibility = View.GONE
             } else {
                 enterFullScreen(playerView)
-                backButton.visibility = View.VISIBLE
                 timeBar.visibility = View.GONE
             }
             fullScreenButton.isSelected = !fullScreenButton.isSelected
@@ -224,6 +226,17 @@ class PlayPageActivity : AppCompatActivity() {
             loadMore()
         }
         loadMore()
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isFullScreen) {
+                    exitFullScreen(playerView)
+                    fullScreenButton.isSelected = false
+                } else {
+                    finish()
+                }
+            }
+        })
     }
 
     //滑动手势
@@ -234,7 +247,6 @@ class PlayPageActivity : AppCompatActivity() {
     }
 
     //全屏以及退出全屏
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun enterFullScreen(playerView: PlayerView) {
         val layoutParams: ViewGroup.LayoutParams = playerView.layoutParams
         // 设置新的高度
@@ -245,7 +257,6 @@ class PlayPageActivity : AppCompatActivity() {
         isFullScreen = true
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun exitFullScreen(playerView: PlayerView) {
         val layoutParams: ViewGroup.LayoutParams = playerView.layoutParams
         // 设置新的高度
