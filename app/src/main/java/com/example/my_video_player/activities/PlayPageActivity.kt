@@ -1,17 +1,26 @@
 package com.example.my_video_player.activities
 
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -45,12 +54,17 @@ import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.atan2
 
 
+@UnstableApi
 class PlayPageActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
+    private lateinit var timeBar: DefaultTimeBar
+    private lateinit var lockButton: ImageView
     private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
     private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
     private var doubleTapDetector: GestureDetector? = null
@@ -60,6 +74,12 @@ class PlayPageActivity : AppCompatActivity() {
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
     private lateinit var videoInfoAdapter: PlayerPageVideoItemAdapter
     private var isFullScreen = false
+    private var orientationListener: OrientationEventListener? = null
+    private var lastOrientation = Configuration.ORIENTATION_UNDEFINED
+    private val handler = Handler(Looper.getMainLooper())
+    private var orientationChangeRunnable: Runnable? = null
+    private val ORIENTATION_THRESHOLD = 15 // 角度变化阈值
+    private val ORIENTATION_DELAY = 500L // 延迟时间
 
     @RequiresApi(Build.VERSION_CODES.R)
     @OptIn(UnstableApi::class)
@@ -80,7 +100,7 @@ class PlayPageActivity : AppCompatActivity() {
         val bundle = intent.extras
         val playerView = findViewById<PlayerView>(R.id.player_view)
         val authorImage = findViewById<ImageFilterView>(R.id.author_image)
-        val timeBar = findViewById<DefaultTimeBar>(R.id.time_bar)
+        timeBar = findViewById(R.id.time_bar)
         timeBar.setEnabled(false);
         Glide.with(this).load(bundle?.getString("authorImage") ?: "").into(authorImage)
         val authorName = findViewById<TextView>(R.id.author_name)
@@ -126,6 +146,7 @@ class PlayPageActivity : AppCompatActivity() {
         val playButton: ImageView = playerView.findViewById(R.id.exo_play)
         val pauseButton: ImageView = playerView.findViewById(R.id.exo_pause)
         val fullScreenButton: ImageView = playerView.findViewById(R.id.fullscreen_btn)
+        lockButton = playerView.findViewById(R.id.lock_btn)
         title.text = bundle?.getString("title")
         backButton.setOnClickListener {
             if (isFullScreen) {
@@ -153,7 +174,6 @@ class PlayPageActivity : AppCompatActivity() {
                 exitFullScreen(playerView)
             } else {
                 enterFullScreen(playerView)
-                timeBar.visibility = View.GONE
             }
             fullScreenButton.isSelected = !fullScreenButton.isSelected
         }
@@ -170,6 +190,10 @@ class PlayPageActivity : AppCompatActivity() {
                 }
             }
         })
+
+        lockButton.setOnClickListener {
+            lockButton.isSelected = !lockButton.isSelected
+        }
 
         doubleTapDetector =
             GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
@@ -237,6 +261,42 @@ class PlayPageActivity : AppCompatActivity() {
                 }
             }
         })
+
+        //监听屏幕方向, 实现了只有再次旋转才会退出全屏，而不是点开全屏之后如果还是横屏会立刻退出全屏
+        orientationListener = object : OrientationEventListener(this) {
+            override fun onOrientationChanged(orientation: Int) {
+                if (orientation == ORIENTATION_UNKNOWN) return
+
+                val currentOrientation =
+                    if (orientation in 45..315) Configuration.ORIENTATION_LANDSCAPE else Configuration.ORIENTATION_PORTRAIT
+
+                if (currentOrientation != lastOrientation && !lockButton.isSelected) {
+                    if (Math.abs(orientation - lastOrientation) > ORIENTATION_THRESHOLD) {
+                        lastOrientation = currentOrientation
+                        orientationChangeRunnable?.let { handler.removeCallbacks(it) }
+                        orientationChangeRunnable = Runnable {
+                            if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                if (orientation in 45..135)
+                                    enterFullScreen(playerView, true)
+                                else
+                                    enterFullScreen(playerView)
+                                fullScreenButton.isSelected = true
+                            } else if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+                                exitFullScreen(playerView)
+                                fullScreenButton.isSelected = false
+                            }
+                        }
+                        handler.postDelayed(orientationChangeRunnable!!, ORIENTATION_DELAY)
+                    }
+                }
+            }
+        }
+        orientationListener?.enable()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
     //滑动手势
@@ -247,14 +307,16 @@ class PlayPageActivity : AppCompatActivity() {
     }
 
     //全屏以及退出全屏
-    private fun enterFullScreen(playerView: PlayerView) {
+    private fun enterFullScreen(playerView: PlayerView, reversed: Boolean = false) {
         val layoutParams: ViewGroup.LayoutParams = playerView.layoutParams
         // 设置新的高度
         layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         // 重新应用修改后的 LayoutParams
         playerView.setLayoutParams(layoutParams)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         isFullScreen = true
+        timeBar.visibility = View.GONE
+        requestedOrientation = if (reversed) ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+        else ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
     }
 
     private fun exitFullScreen(playerView: PlayerView) {
@@ -263,13 +325,14 @@ class PlayPageActivity : AppCompatActivity() {
         layoutParams.height = (layoutParams.width / 16) * 9
         // 重新应用修改后的 LayoutParams
         playerView.setLayoutParams(layoutParams)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         isFullScreen = false
+        timeBar.visibility = View.VISIBLE
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        Log.d("ice", isFullScreen.toString())
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (isFullScreen) {
                 window.insetsController!!.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
@@ -288,16 +351,19 @@ class PlayPageActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         player.release()
+        orientationListener?.disable()
     }
 
     override fun onPause() {
         super.onPause()
         player.pause()
+        orientationListener?.disable()
     }
 
     override fun onRestart() {
         super.onRestart()
         player.play()
+        orientationListener?.enable()
     }
 
     private fun loadMore() {
