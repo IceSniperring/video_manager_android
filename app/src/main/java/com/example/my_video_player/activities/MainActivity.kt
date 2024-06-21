@@ -11,6 +11,7 @@ import com.example.my_video_player.R
 import com.example.my_video_player.adapters.MainActivityAdapter
 import com.example.my_video_player.fragments.HomePageFragment
 import com.example.my_video_player.fragments.MinePageFragment
+import com.example.my_video_player.fragments.UploadPageFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         val viewPager = findViewById<ViewPager2>(R.id.view_pager2)
         val fragmentList: MutableList<Fragment> = mutableListOf()
         fragmentList.add(HomePageFragment())
+        fragmentList.add(UploadPageFragment())
         fragmentList.add(MinePageFragment())
         val mainActivityAdapter =
             MainActivityAdapter(supportFragmentManager, lifecycle, fragmentList)
@@ -36,7 +38,8 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home_page -> viewPager.setCurrentItem(0, false) // 第二个参数为是否平滑滚动
-                R.id.mine_page -> viewPager.setCurrentItem(1, false)
+                R.id.upload_page -> viewPager.setCurrentItem(1, false) // 第二个参数为是否平滑滚动
+                R.id.mine_page -> viewPager.setCurrentItem(2, false)
             }
             true
         }

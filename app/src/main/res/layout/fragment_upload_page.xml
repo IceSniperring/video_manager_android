@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.UploadPageFragment">
+
+    <TextView
+        android:id="@+id/upload_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="请选择视频"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/video_thumbnail"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.utils.widget.ImageFilterView
+        android:id="@+id/video_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:background="#373737"
+        android:clickable="true"
+        android:foreground="@drawable/ripple_effect"
+        android:scaleType="fitCenter"
+        app:layout_constraintDimensionRatio="8:5"
+        app:layout_constraintTop_toBottomOf="@id/upload_title"
+        app:round="8dp" />
+
+    <LinearLayout
+        android:id="@+id/upload_tint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/video_thumbnail"
+        app:layout_constraintEnd_toEndOf="@+id/video_thumbnail"
+        app:layout_constraintStart_toStartOf="@+id/video_thumbnail"
+        app:layout_constraintTop_toTopOf="@+id/video_thumbnail">
+
+        <ImageView
+            android:id="@+id/upload_icon2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/upload_icon_2"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/upload_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="点击上传"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/upload_icon2" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/video_kind"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="100dp"
+        android:background="@drawable/sm_edit_round_bkg"
+        android:hint="请输入视频分类"
+        android:inputType="text"
+        android:maxLines="3"
+        android:padding="12dp"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/video_thumbnail" />
+
+    <EditText
+        android:id="@+id/video_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/sm_edit_round_bkg"
+        android:hint="请输入视频标题"
+        android:inputType="text"
+        android:maxLines="1"
+        android:padding="12dp"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/video_kind" />
+
+    <TextView
+        android:id="@+id/video_poster"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/sm_btn_round_bkg"
+        android:clickable="true"
+        android:maxLines="1"
+        android:padding="14dp"
+        android:text="修改封面"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/video_title" />
+
+    <TextView
+        android:id="@+id/confirm_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textColor="@color/black"
+        android:background="@drawable/sm_confirm_round_bkg"
+        android:clickable="true"
+        android:maxLines="1"
+        android:padding="14dp"
+        android:text="确认提交"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/video_poster" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

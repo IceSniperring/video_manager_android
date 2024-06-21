@@ -6,6 +6,11 @@
         android:title="主页" />
 
     <item
+        android:id="@+id/upload_page"
+        android:icon="@drawable/upload_icon"
+        android:title="上传" />
+
+    <item
         android:id="@+id/mine_page"
         android:icon="@drawable/mine_icon"
         android:title="我的" />

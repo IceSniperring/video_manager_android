@@ -7,14 +7,15 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
-        app:tabMode="scrollable"
-        app:tabIndicatorHeight="2dp"
-        app:tabIndicatorColor="#FB9AEC"
-        app:tabSelectedTextColor="#FB9AEC"
-        app:tabIndicator="@drawable/tab_indicator"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="25dp"
         android:background="@color/black"
+        app:tabIndicator="@drawable/tab_indicator"
+        app:tabIndicatorColor="#FB9AEC"
+        app:tabIndicatorHeight="2dp"
+        app:tabMode="scrollable"
+        app:tabRippleColor="@android:color/transparent"
+        app:tabSelectedTextColor="#FB9AEC"
         app:tabTextAppearance="@style/CustomTabTextAppearance" />
 
     <androidx.viewpager2.widget.ViewPager2
