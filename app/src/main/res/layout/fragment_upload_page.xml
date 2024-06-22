@@ -72,16 +72,30 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
-            android:text="上传进度：0%" />
+            android:text="上传进度：0%"
+            android:textSize="10sp" />
 
         <ProgressBar
             android:id="@+id/upload_progress"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="3dp"
             android:layout_margin="10dp"
-            android:progress="0" />
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/progress_style" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/video_kind_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="视频分类"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/video_kind"
+        app:layout_constraintStart_toStartOf="@id/video_kind"
+        app:layout_constraintTop_toBottomOf="@+id/upload_progress_area" />
 
     <EditText
         android:id="@+id/video_kind"
@@ -94,7 +108,18 @@
         android:maxLines="3"
         android:padding="12dp"
         android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@+id/upload_progress_area" />
+        app:layout_constraintTop_toBottomOf="@+id/video_kind_text" />
+
+    <TextView
+        android:id="@+id/video_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="视频标题"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/video_title"
+        app:layout_constraintStart_toStartOf="@id/video_title"
+        app:layout_constraintTop_toBottomOf="@+id/video_kind" />
 
     <EditText
         android:id="@+id/video_title"
@@ -107,7 +132,7 @@
         android:maxLines="1"
         android:padding="12dp"
         android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@+id/video_kind" />
+        app:layout_constraintTop_toBottomOf="@+id/video_title_text" />
 
     <TextView
         android:id="@+id/video_poster"

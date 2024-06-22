@@ -1,8 +1,12 @@
 package com.example.my_video_player.fragments
 
+import android.R.attr
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
@@ -28,6 +32,7 @@ import com.example.my_video_player.entities.UploadVideoFormData
 import com.example.my_video_player.eventsEntities.KindRefreshEvent
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
+import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
@@ -115,6 +120,8 @@ class UploadPageFragment : Fragment() {
             posterPickerLauncher.launch(intent)
         }
         confirmBtn.setOnClickListener {
+            uploadProgress.progress = 0
+            uploadProgressText.text = "上传进度：0%"
             if (uploadVideoFormData.videoUri == Uri.EMPTY) {
                 NoticeDialogFragment("警告！", "请选择视频") {}.show(
                     childFragmentManager,
@@ -133,10 +140,10 @@ class UploadPageFragment : Fragment() {
             } else {
                 uploadVideoFormData.title = title.text.toString()
                 uploadVideoFormData.kind = kind.text.toString()
+                uploadVideoFormData.uid = MMKV.defaultMMKV().decodeLong("uid").toString() ?: ""
                 uploadVideo()
             }
         }
-        uploadVideoFormData.uid = MMKV.defaultMMKV().decodeLong("uid").toString() ?: ""
         return view
     }
 
@@ -173,7 +180,16 @@ class UploadPageFragment : Fragment() {
     }
 
     private fun uploadVideo() {
+        Toast.makeText(requireContext(), "开始上传", Toast.LENGTH_SHORT).show()
         uploadProgressArea.visibility = View.VISIBLE
+        videoPoster.isEnabled = false
+        videoPoster.alpha = 0.5f
+        confirmBtn.isEnabled = false
+        confirmBtn.alpha = 0.5f
+        confirmBtn.text = "上传中"
+        val badge = bottomNavigationView.getOrCreateBadge(R.id.upload_page)
+        badge.setTextAppearance(R.style.BadgeTextAppearance)
+        badge.text = "上传中"
         RetrofitUtil.uploadVideo(
             uploadVideoFormData,
             requireContext(),
@@ -189,15 +205,19 @@ class UploadPageFragment : Fragment() {
             }, object : ProgressRequestBody.ProgressListener {
                 override fun onProgress(progress: Int) {
                     handler.post {
-                        confirmBtn.isEnabled = false
                         uploadProgress.progress = progress
                         uploadProgressText.text = "上传进度：$progress%"
                     }
                     if (progress == 100) {
                         uploadProgressArea.visibility = View.INVISIBLE
                         handler.post {
+                            videoPoster.isEnabled = true
+                            videoPoster.alpha = 1f
                             confirmBtn.isEnabled = true
+                            confirmBtn.alpha = 1f
+                            confirmBtn.text = "确认提交"
                         }
+                        bottomNavigationView.removeBadge(R.id.upload_page)
                     }
                 }
             })
@@ -211,4 +231,5 @@ class UploadPageFragment : Fragment() {
         }
         return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }
+
 }

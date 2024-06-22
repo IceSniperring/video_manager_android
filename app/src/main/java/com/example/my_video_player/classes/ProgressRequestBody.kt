@@ -19,7 +19,8 @@ class ProgressRequestBody(
     interface ProgressListener {
         fun onProgress(progress: Int)
     }
-    override fun contentType(): MediaType? {
+
+    override fun contentType(): MediaType {
         return contentType
     }
 
@@ -44,6 +45,7 @@ class ProgressRequestBody(
                 sink.write(buffer, bytesRead)
                 totalBytesRead += bytesRead
                 val progress = (totalBytesRead * 100 / contentLength()).toInt()
+                //以10%为单位调用接口
                 if (progress != lastProgress) {
                     progressListener.onProgress(progress)
                     lastProgress = progress

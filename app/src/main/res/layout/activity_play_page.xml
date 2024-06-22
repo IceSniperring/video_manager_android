@@ -35,8 +35,8 @@
     <androidx.constraintlayout.utils.widget.ImageFilterView
         android:scaleType="centerCrop"
         android:id="@+id/author_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:background="@color/white"

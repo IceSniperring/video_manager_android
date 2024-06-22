@@ -32,4 +32,8 @@
         <!-- 添加其他自定义属性 -->
     </style>
 
+    <!--徽章（导航栏提示角标）样式-->
+    <style name="BadgeTextAppearance">
+        <item name="android:textSize">6sp</item>
+    </style>
 </resources>
