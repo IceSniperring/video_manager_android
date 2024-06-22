@@ -8,9 +8,9 @@ import okhttp3.ResponseBody
 class LoggerInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        Log.d("request信息：", request.toString())
+        Log.w("request信息：", request.toString())
         val response = chain.proceed(request)
-        Log.d("response code：", response.code.toString())
+        Log.w("response code：", response.code.toString())
         val responseBody = response.body
         if (responseBody != null) {
             val bodyStr = responseBody.string()

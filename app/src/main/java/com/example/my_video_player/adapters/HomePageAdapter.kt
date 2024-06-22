@@ -8,7 +8,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 class HomePageAdapter(
     private val fragmentManager: FragmentManager,
     private val lifecycle: Lifecycle,
-    private val fragmentList: MutableList<Fragment>
+    private var fragmentList: MutableList<Fragment>
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int {
         return fragmentList.size
@@ -16,5 +16,10 @@ class HomePageAdapter(
 
     override fun createFragment(position: Int): Fragment {
         return fragmentList[position]
+    }
+
+    fun updateFragmentList(newFragmentList: MutableList<Fragment>) {
+        fragmentList = newFragmentList
+        notifyDataSetChanged()
     }
 }

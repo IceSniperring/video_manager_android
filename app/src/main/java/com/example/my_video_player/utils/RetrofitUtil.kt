@@ -1,26 +1,39 @@
 package com.example.my_video_player.utils
 
+import com.example.my_video_player.classes.ProgressRequestBody
+import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.provider.OpenableColumns
+import android.util.Log
 import com.example.my_video_player.entities.LoginStatusEntity
 import com.example.my_video_player.entities.LoginUserEntity
-import com.example.my_video_player.entities.VideoEntity
+import com.example.my_video_player.entities.UploadResponseEntity
+import com.example.my_video_player.entities.UploadVideoFormData
 import com.example.my_video_player.entities.UserEntity
+import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.interceptors.LoggerInterceptor
 import com.example.my_video_player.interfaces.ApiService
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.tencent.mmkv.MMKV
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.InputStream
 
 object RetrofitUtil {
     private val serverAddress = MMKV.defaultMMKV().decodeString("serverAddress")
-    private val BASE_URL = serverAddress ?: "http://192.168.31.200:10003"
+    private val BASE_URL = serverAddress ?: "http://192.168.31.200:10001"
     private val okHttpClient = OkHttpClient.Builder().addInterceptor(LoggerInterceptor()).build()
     private var retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -96,6 +109,56 @@ object RetrofitUtil {
         getUserInfoApi.enqueue(MyCallback(callBackInfo, context))
     }
 
+
+    fun uploadVideo(
+        uploadVideoFormData: UploadVideoFormData,
+        context: Context,
+        callBackInfo: CallBackInfo<UploadResponseEntity>,
+        progressListener: ProgressRequestBody.ProgressListener
+    ) {
+        try {
+            val videoRequestBody = ProgressRequestBody(
+                context,
+                uploadVideoFormData.videoUri,
+                "multipart/form-data".toMediaType(),
+                progressListener
+            )
+
+            val postRequestBody = ProgressRequestBody(
+                context,
+                uploadVideoFormData.postUri,
+                "multipart/form-data".toMediaType(),
+                progressListener
+            )
+
+            val uploadVideoApi = apiService.uploadVideo(
+                MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("uid", uploadVideoFormData.uid)
+                    .addFormDataPart("kind", uploadVideoFormData.kind)
+                    .addFormDataPart("title", uploadVideoFormData.title)
+                    .addFormDataPart(
+                        "videoFile",
+                        getFileName(context, uploadVideoFormData.videoUri),
+                        videoRequestBody
+                    )
+                    .addFormDataPart(
+                        "postFile",
+                        getFileName(context, uploadVideoFormData.postUri),
+                        postRequestBody
+                    )
+                    .build()
+            )
+
+            uploadVideoApi.enqueue(MyCallback(callBackInfo, context))
+        } catch (e: Exception) {
+            Log.e("uploadVideo", "Error uploading video", e)
+            handler.post {
+                callBackInfo.onFailure(-1, FAILURE_MEG)
+            }
+        }
+    }
+
     class MyCallback<T>(private val callBackInfo: CallBackInfo<T>, private val context: Context) :
         Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
@@ -115,6 +178,10 @@ object RetrofitUtil {
                         is LoginStatusEntity -> {
                             callBackInfo.onSuccess(responseEntity)
                         }
+
+                        is UploadResponseEntity -> {
+                            callBackInfo.onSuccess(responseEntity)
+                        }
                     }
                 } else handler.post {
                     callBackInfo.onFailure(responseCode, FAILURE_MEG)
@@ -129,5 +196,39 @@ object RetrofitUtil {
                 callBackInfo.onFailure(-1, FAILURE_MEG)
             }
         }
+    }
+
+    private fun getRequestBodyFromUri(context: Context, uri: Uri): RequestBody {
+        val contentResolver = context.contentResolver
+        val inputStream: InputStream? = contentResolver.openInputStream(uri)
+        val fileBytes = inputStream?.readBytes()
+        inputStream?.close()
+        return fileBytes!!.toRequestBody(
+            "multipart/form-data".toMediaTypeOrNull(),
+            0,
+            fileBytes.size
+        )
+    }
+
+    //通过Uri获取文件名
+    @SuppressLint("Range")
+    private fun getFileName(context: Context, uri: Uri): String {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor = context.contentResolver.query(uri, null, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    result = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result!!.lastIndexOf('/')
+            if (cut != -1) {
+                result = result!!.substring(cut + 1)
+            }
+        }
+        return result!!
     }
 }
