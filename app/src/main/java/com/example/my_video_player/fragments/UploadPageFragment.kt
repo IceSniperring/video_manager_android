@@ -189,11 +189,15 @@ class UploadPageFragment : Fragment() {
             }, object : ProgressRequestBody.ProgressListener {
                 override fun onProgress(progress: Int) {
                     handler.post {
+                        confirmBtn.isEnabled = false
                         uploadProgress.progress = progress
                         uploadProgressText.text = "上传进度：$progress%"
                     }
                     if (progress == 100) {
                         uploadProgressArea.visibility = View.INVISIBLE
+                        handler.post {
+                            confirmBtn.isEnabled = true
+                        }
                     }
                 }
             })
