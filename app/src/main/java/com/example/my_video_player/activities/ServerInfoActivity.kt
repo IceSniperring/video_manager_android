@@ -1,7 +1,11 @@
 package com.example.my_video_player.activities
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -11,7 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.my_video_player.R
 import com.example.my_video_player.fragments.LoadingDialogFragment
-import com.example.my_video_player.fragments.AlterDialogFragment
+import com.example.my_video_player.fragments.AlertDialogFragment
 import com.example.my_video_player.fragments.NoticeDialogFragment
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.ConnectTestUtil
@@ -62,8 +66,25 @@ class ServerInfoActivity : AppCompatActivity() {
                 Toast.makeText(this, "请输入正确的URL", Toast.LENGTH_SHORT).show()
             } else {
                 if (serverAddressString.isNotEmpty() && resourceAddressString.isNotEmpty()) {
-                    val message = "后端地址:$serverAddressString\n资源地址:$resourceAddressString"
-                    AlterDialogFragment("是否确认服务器信息", message,
+                    val message = "后端地址：$serverAddressString\n资源地址：$resourceAddressString"
+                    val serverAddressStart = message.indexOf(serverAddressString)
+                    val serverAddressEnd = serverAddressStart + serverAddressString.length
+                    val resourceAddressStart = message.indexOf(resourceAddressString)
+                    val resourceAddressEnd = resourceAddressStart + resourceAddressString.length
+                    val spannable = SpannableString(message)
+                    spannable.setSpan(
+                        ForegroundColorSpan(Color.parseColor("#55C8F6")),
+                        serverAddressStart,
+                        serverAddressEnd,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    spannable.setSpan(
+                        ForegroundColorSpan(Color.parseColor("#55C8F6")),
+                        resourceAddressStart,
+                        resourceAddressEnd,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    AlertDialogFragment("是否确认服务器信息", spannable,
                         {
                             loadingDialogFragment.show(supportFragmentManager, "")
                             ConnectTestUtil.testConnect(object : CallBackInfo<List<String>> {
@@ -72,7 +93,7 @@ class ServerInfoActivity : AppCompatActivity() {
                                     MMKV.defaultMMKV()
                                         .encode("resourceAddress", resourceAddressString)
                                     loadingDialogFragment.dismiss()
-                                    NoticeDialogFragment("连接成功", "恭喜设置成功！") {
+                                    NoticeDialogFragment("success", "连接成功", "恭喜设置成功！") {
                                         finish()
                                         if (intent.getBooleanExtra("isReConfig", false)) {
                                             val intent = Intent(
@@ -97,7 +118,11 @@ class ServerInfoActivity : AppCompatActivity() {
                                 }
 
                                 override fun onFailure(code: Int, meg: String) {
-                                    NoticeDialogFragment("连接失败", "原因:${meg}") {}.show(
+                                    NoticeDialogFragment(
+                                        "error",
+                                        "连接失败",
+                                        "原因:${meg}"
+                                    ) {}.show(
                                         supportFragmentManager,
                                         "connect_result"
                                     )

@@ -15,10 +15,15 @@ import com.example.my_video_player.adapters.VideoItemAdapter
 import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.VideoItemEntity
+import com.example.my_video_player.eventsEntities.KindRefreshEvent
+import com.example.my_video_player.eventsEntities.VideoRefreshEvent
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.tencent.mmkv.MMKV
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class VideoClassFragment : Fragment() {
     private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
@@ -27,6 +32,11 @@ class VideoClassFragment : Fragment() {
     private lateinit var smartRefreshLayout: SmartRefreshLayout
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
     private lateinit var videoInfoAdapter: VideoItemAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        EventBus.getDefault().register(this)
+    }
 
     companion object {
         private const val ARG_VIDEO_CLASS = "arg_video_class"
@@ -72,6 +82,7 @@ class VideoClassFragment : Fragment() {
         RetrofitUtil.getVideoByKind(requireContext(), object :
             CallBackInfo<VideoEntity> {
             override fun onSuccess(data: VideoEntity) {
+                EventBus.getDefault().postSticky(KindRefreshEvent())
                 val records = data.records
                 videoItemEntityList.clear()
                 videoInfoAdapter.notifyDataSetChanged()
@@ -174,5 +185,15 @@ class VideoClassFragment : Fragment() {
 
             override fun onFailure(code: Int, msg: String) {}
         }, videoClass, current)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    fun onVideoRefreshEvent(event: VideoRefreshEvent) {
+        refresh()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
     }
 }

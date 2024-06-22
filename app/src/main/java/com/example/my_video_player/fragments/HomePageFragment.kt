@@ -1,11 +1,13 @@
 package com.example.my_video_player.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.example.my_video_player.R
@@ -24,6 +26,8 @@ class HomePageFragment : Fragment() {
     private lateinit var homePageViewPager: ViewPager2
     private val fragmentList: MutableList<Fragment> = mutableListOf()
     private lateinit var homePageAdapter: HomePageAdapter
+    private lateinit var emptyArea: ConstraintLayout
+    private lateinit var loadingView: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,15 +43,22 @@ class HomePageFragment : Fragment() {
         tabLayout = view.findViewById(R.id.tab_layout)
         homePageAdapter = HomePageAdapter(childFragmentManager, lifecycle, fragmentList)
         homePageViewPager.adapter = homePageAdapter
-
+        emptyArea = view.findViewById(R.id.empty_area)
+        loadingView = view.findViewById(R.id.loading_view)
         getKindsAndUpdateUI()
-
+        val retryBtn = view.findViewById<TextView>(R.id.retry_text)
+        retryBtn.setOnClickListener {
+            getKindsAndUpdateUI()
+            loadingView.visibility = View.VISIBLE
+            emptyArea.visibility = View.GONE
+        }
         return view
     }
 
     private fun getKindsAndUpdateUI() {
         RetrofitUtil.getKind(requireContext(), object : CallBackInfo<List<String>> {
             override fun onSuccess(data: List<String>) {
+                loadingView.visibility = View.GONE
                 // 清空当前的分类和fragment列表
                 fragmentList.clear()
                 // 添加 "主页"
@@ -68,7 +79,9 @@ class HomePageFragment : Fragment() {
             }
 
             override fun onFailure(code: Int, meg: String) {
-                Toast.makeText(requireContext(), "获取分类失败", Toast.LENGTH_SHORT).show()
+                loadingView.visibility = View.GONE
+                emptyArea.visibility = View.VISIBLE
+                Toast.makeText(requireContext(), "获取数据失败", Toast.LENGTH_SHORT).show()
             }
         })
     }

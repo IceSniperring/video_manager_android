@@ -33,6 +33,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -42,6 +45,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -77,4 +82,6 @@ dependencies {
 
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
     implementation ("com.github.centerzx:ShapeBlurView:1.0.5")
+
+    implementation ("com.github.ybq:Android-SpinKit:1.4.0")
 }

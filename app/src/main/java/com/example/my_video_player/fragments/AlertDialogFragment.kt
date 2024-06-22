@@ -1,7 +1,9 @@
 package com.example.my_video_player.fragments
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
+import android.text.SpannableString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams
@@ -9,9 +11,9 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.my_video_player.R
 
-class AlterDialogFragment(
+class AlertDialogFragment(
     private val title: String,
-    private val message: String,
+    private val message: SpannableString,
     private val onPositiveButtonClickListener: View.OnClickListener,
     private val onNegativeButtonClickListener: View.OnClickListener
 ) : DialogFragment() {
@@ -20,8 +22,8 @@ class AlterDialogFragment(
         val view = LayoutInflater.from(context).inflate(R.layout.fragment_alert_dialog, null)
         dialog.setContentView(view)
 
-        val titleTextView = view.findViewById<TextView>(R.id.my_dialog_title)
-        val messageTextView = view.findViewById<TextView>(R.id.my_dialog_message)
+        val titleTextView = view.findViewById<TextView>(R.id.alert_dialog_title)
+        val messageTextView = view.findViewById<TextView>(R.id.alert_dialog_message)
         val cancelButton = view.findViewById<TextView>(R.id.my_dialog_cancel)
         val confirmButton = view.findViewById<TextView>(R.id.my_dialog_confirm)
 
@@ -35,7 +37,6 @@ class AlterDialogFragment(
             onNegativeButtonClickListener.onClick(it)
             dismiss()
         }
-
         return dialog
     }
 
@@ -46,5 +47,10 @@ class AlterDialogFragment(
             (268 * resources.displayMetrics.density).toInt(),
             LayoutParams.WRAP_CONTENT
         )
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        onNegativeButtonClickListener.onClick(view)
+        super.onDismiss(dialog)
     }
 }

@@ -65,7 +65,11 @@ class LoginPageActivity : AppCompatActivity() {
                             object : CallBackInfo<UserEntity> {
                                 override fun onSuccess(data: UserEntity) {
                                     loadingDialogFragment.dismiss()
-                                    NoticeDialogFragment("登陆成功", "登陆成功，欢迎回来!") {
+                                    NoticeDialogFragment(
+                                        "success",
+                                        "登陆成功",
+                                        "登陆成功，欢迎回来!"
+                                    ) {
                                         EventBus.getDefault().postSticky(
                                             LoginEventEntity(
                                                 data.username,
@@ -88,7 +92,11 @@ class LoginPageActivity : AppCompatActivity() {
 
                                 override fun onFailure(code: Int, meg: String) {
                                     loadingDialogFragment.dismiss()
-                                    NoticeDialogFragment("错误", "code:$code\n meg:$meg") {}.show(
+                                    NoticeDialogFragment(
+                                        "error",
+                                        "错误",
+                                        "code:$code\n meg:$meg"
+                                    ) {}.show(
                                         supportFragmentManager, "network_error"
                                     )
                                 }
@@ -100,15 +108,19 @@ class LoginPageActivity : AppCompatActivity() {
                 } else {
                     loadingDialogFragment.dismiss()
                     if (data.code == 2) {
-                        NoticeDialogFragment("密码错误", "密码错误，请重新输入") {}.show(
+                        NoticeDialogFragment("error", "密码错误", "密码错误，请重新输入") {}.show(
                             supportFragmentManager, "password_error"
                         )
                     } else if (data.code == 3) {
-                        NoticeDialogFragment("用户不存在", "用户不存在，请重新输入") {}.show(
+                        NoticeDialogFragment(
+                            "error",
+                            "用户不存在",
+                            "用户不存在，请重新输入"
+                        ) {}.show(
                             supportFragmentManager, "user_error"
                         )
                     } else if (data.code == 4) {
-                        NoticeDialogFragment("未知错误", "未知错误！！！！") {}.show(
+                        NoticeDialogFragment("error", "未知错误", "未知错误！！！！") {}.show(
                             supportFragmentManager, "unknown_error"
                         )
                     }
@@ -117,7 +129,7 @@ class LoginPageActivity : AppCompatActivity() {
 
             override fun onFailure(code: Int, meg: String) {
                 loadingDialogFragment.dismiss()
-                NoticeDialogFragment("错误", "code:$code\nmeg:$meg") {}.show(
+                NoticeDialogFragment("error", "错误", "code:$code\nmeg:$meg") {}.show(
                     supportFragmentManager, "network_error"
                 )
             }

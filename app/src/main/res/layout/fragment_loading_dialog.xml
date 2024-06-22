@@ -12,11 +12,12 @@
         app:blur_overlay_color="#D87C7C7C"
         app:blur_radius="20dp" />
 
-    <ImageView
+    <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/loading_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/loading"
+        style="@style/SpinKitView.Small.CubeGrid"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:SpinKit_Color="#55C8F6"
         app:layout_constraintBottom_toTopOf="@id/loading_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +30,7 @@
         android:layout_marginTop="12dp"
         android:text="加载中..."
         android:textAlignment="center"
-        android:textSize="12sp"
+        android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

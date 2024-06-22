@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp">
+
+    <androidx.constraintlayout.utils.widget.ImageFilterView
+        android:id="@+id/video_poster"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_background"
+        app:layout_constraintDimensionRatio="8:5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5"
+        app:round="4dp" />
+
+    <TextView
+        android:id="@+id/video_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:paddingStart="20dp"
+        android:paddingEnd="10dp"
+        android:text="标题"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/video_poster"
+        app:layout_constraintTop_toTopOf="@id/video_poster"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5" />
+
+
+    <TextView
+        android:id="@+id/video_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="20dp"
+        android:paddingEnd="10dp"
+        android:text="2023-08-03 00:25:03"
+        android:textColor="#717171"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@id/video_poster"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/video_poster"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5" />
+
+    <TextView
+        android:id="@+id/video_kind_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="10dp"
+        android:text="分类:"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/video_kind"
+        app:layout_constraintStart_toStartOf="@id/video_title"
+        app:layout_constraintTop_toBottomOf="@id/video_title"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/video_kind"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:paddingStart="20dp"
+        android:paddingEnd="10dp"
+        android:text="vue"
+        android:textAllCaps="true"
+        android:textColor="#6AA9BC"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/video_date"
+        app:layout_constraintStart_toStartOf="@id/video_title"
+        app:layout_constraintTop_toBottomOf="@id/video_kind_label"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5" />
+
+    <TextView
+        android:id="@+id/video_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/sm_delete_btn_round_bkg"
+        android:clickable="true"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:paddingStart="12dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp"
+        android:text="删除"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/video_poster" />
+
+    <TextView
+        android:id="@+id/video_editor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/sm_confirm_round_bkg"
+        android:clickable="true"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:paddingStart="12dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp"
+        android:text="编辑"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@id/video_delete"
+        app:layout_constraintTop_toBottomOf="@id/video_poster" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/divide_line"
+        app:layout_constraintTop_toBottomOf="@id/video_editor"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,8 +1,5 @@
 package com.example.my_video_player.fragments
 
-import android.R.attr
-import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -12,6 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,11 +28,11 @@ import com.example.my_video_player.R
 import com.example.my_video_player.activities.LoginPageActivity
 import com.example.my_video_player.classes.ProgressRequestBody
 import com.example.my_video_player.entities.UploadResponseEntity
-import com.example.my_video_player.entities.UploadVideoFormData
+import com.example.my_video_player.classes.UploadVideoFormData
 import com.example.my_video_player.eventsEntities.KindRefreshEvent
+import com.example.my_video_player.eventsEntities.VideoRefreshEvent
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
-import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
@@ -57,7 +57,7 @@ class UploadPageFragment : Fragment() {
         super.onResume()
         val username = MMKV.defaultMMKV().decodeString("username")
         if (username == null) {
-            AlterDialogFragment("要登陆吗？", "请先登录后再上传视频", {
+            AlertDialogFragment("要登陆吗？", SpannableString("请先登录后再上传视频"), {
                 val intent = Intent(requireContext(), LoginPageActivity::class.java)
                 startActivity(intent)
             }, {
@@ -123,25 +123,46 @@ class UploadPageFragment : Fragment() {
             uploadProgress.progress = 0
             uploadProgressText.text = "上传进度：0%"
             if (uploadVideoFormData.videoUri == Uri.EMPTY) {
-                NoticeDialogFragment("警告！", "请选择视频") {}.show(
+                NoticeDialogFragment("warning", "警告！", "请选择视频") {}.show(
                     childFragmentManager,
                     "notice_dialog"
                 )
             } else if (kind.text.toString().isEmpty()) {
-                NoticeDialogFragment("警告！", "请填写视频分类") {}.show(
+                NoticeDialogFragment("warning", "警告！", "请填写视频分类") {}.show(
                     childFragmentManager,
                     "notice_dialog"
                 )
             } else if (title.text.toString().isEmpty()) {
-                NoticeDialogFragment("警告！", "请填写视频标题") {}.show(
+                NoticeDialogFragment("warning", "警告！", "请填写视频标题") {}.show(
                     childFragmentManager,
                     "notice_dialog"
                 )
             } else {
-                uploadVideoFormData.title = title.text.toString()
-                uploadVideoFormData.kind = kind.text.toString()
-                uploadVideoFormData.uid = MMKV.defaultMMKV().decodeLong("uid").toString() ?: ""
-                uploadVideo()
+                val message = "视频名称：${title.text}\n分类：${kind.text}"
+                val spannable = SpannableString(message)
+                val titleTextStart = message.indexOf(title.text.toString())
+                val titleTextEnd = titleTextStart + title.text.length
+                val kindTextStart = message.indexOf(kind.text.toString())
+                val kindTextEnd = kindTextStart + kind.text.length
+                // 设置颜色
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#55C8F6")),
+                    titleTextStart,
+                    titleTextEnd,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#55C8F6")),
+                    kindTextStart,
+                    kindTextEnd,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                AlertDialogFragment("确定上传吗？", spannable, {
+                    uploadVideoFormData.title = title.text.toString()
+                    uploadVideoFormData.kind = kind.text.toString()
+                    uploadVideoFormData.uid = MMKV.defaultMMKV().decodeLong("uid").toString() ?: ""
+                    uploadVideo()
+                }, {}).show(childFragmentManager, "alert_dialog")
             }
         }
         return view
@@ -197,6 +218,7 @@ class UploadPageFragment : Fragment() {
                 override fun onSuccess(data: UploadResponseEntity) {
                     Toast.makeText(requireContext(), "上传成功", Toast.LENGTH_SHORT).show()
                     EventBus.getDefault().postSticky(KindRefreshEvent())
+                    EventBus.getDefault().postSticky(VideoRefreshEvent())
                 }
 
                 override fun onFailure(code: Int, meg: String) {

@@ -6,16 +6,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import com.bumptech.glide.Glide
 import com.example.my_video_player.R
 
 class NoticeDialogFragment(
+    private val type: String,
     private val title: String,
     private val message: String,
     private val onClickListener: View.OnClickListener,
-
-    ) : DialogFragment() {
+) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = Dialog(requireContext(), R.style.CustomDialog) // 使用自定义样式
         val view = LayoutInflater.from(context).inflate(R.layout.fragment_notice_dialog, null)
@@ -24,7 +26,14 @@ class NoticeDialogFragment(
         val titleTextView = view.findViewById<TextView>(R.id.notice_dialog_title)
         val messageTextView = view.findViewById<TextView>(R.id.notice_dialog_message)
         val dialogButton = view.findViewById<TextView>(R.id.dialog_button)
-
+        val tipIcon = view.findViewById<ImageView>(R.id.notice_dialog_tip)
+        Glide.with(this).load(
+            when (type) {
+                "success" -> R.drawable.success_tip
+                "warning" -> R.drawable.warning_tip
+                else -> R.drawable.error_tip
+            }
+        ).into(tipIcon)
         titleTextView.text = this.title
         messageTextView.text = this.message
         dialogButton.setOnClickListener {

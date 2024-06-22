@@ -8,28 +8,27 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.OpenableColumns
 import android.util.Log
+import com.example.my_video_player.classes.UpdateVideoFormData
+import com.example.my_video_player.entities.CommonResponseEntity
 import com.example.my_video_player.entities.LoginStatusEntity
 import com.example.my_video_player.entities.LoginUserEntity
 import com.example.my_video_player.entities.UploadResponseEntity
-import com.example.my_video_player.entities.UploadVideoFormData
+import com.example.my_video_player.classes.UploadVideoFormData
 import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.entities.VideoEntity
+import com.example.my_video_player.entities.VideoInfoEntity
 import com.example.my_video_player.interceptors.LoggerInterceptor
 import com.example.my_video_player.interfaces.ApiService
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.tencent.mmkv.MMKV
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.InputStream
 
 object RetrofitUtil {
     private val serverAddress = MMKV.defaultMMKV().decodeString("serverAddress")
@@ -159,6 +158,76 @@ object RetrofitUtil {
         }
     }
 
+    fun getVideoByUid(uid: Long, callBackInfo: CallBackInfo<List<VideoInfoEntity>>) {
+        val getVideoByUidApi = apiService.getVideoByUid(uid)
+        getVideoByUidApi.enqueue(object : Callback<List<VideoInfoEntity>> {
+            override fun onResponse(
+                call: Call<List<VideoInfoEntity>>,
+                response: Response<List<VideoInfoEntity>>
+            ) {
+                val responseCode = response.code()
+                if (response.isSuccessful) {
+                    val responseEntity = response.body()
+                    if (responseEntity != null) {
+                        callBackInfo.onSuccess(responseEntity)
+                    } else handler.post {
+                        callBackInfo.onFailure(responseCode, FAILURE_MEG)
+                    }
+                } else handler.post {
+                    callBackInfo.onFailure(responseCode, FAILURE_MEG)
+                }
+            }
+
+            override fun onFailure(call: Call<List<VideoInfoEntity>>, t: Throwable) {
+                callBackInfo.onFailure(-1, FAILURE_MEG)
+            }
+        })
+    }
+
+    fun deleteVideoById(
+        id: Long,
+        context: Context,
+        callBackInfo: CallBackInfo<CommonResponseEntity>
+    ) {
+        val deleteVideoByIdApi = apiService.deleteVideo(id)
+        deleteVideoByIdApi.enqueue(MyCallback(callBackInfo, context))
+    }
+
+    fun updateVideo(
+        updateVideoFormData: UpdateVideoFormData,
+        context: Context,
+        callBackInfo: CallBackInfo<CommonResponseEntity>,
+        progressListener: ProgressRequestBody.ProgressListener
+    ) {
+        try {
+            val postRequestBody = ProgressRequestBody(
+                context,
+                updateVideoFormData.postUri,
+                "multipart/form-data".toMediaType(),
+                progressListener
+            )
+
+            val updateVideoApi = apiService.updateVideo(
+                MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("id", updateVideoFormData.id)
+                    .addFormDataPart("title", updateVideoFormData.title)
+                    .addFormDataPart(
+                        "postFile",
+                        getFileName(context, updateVideoFormData.postUri),
+                        postRequestBody
+                    )
+                    .build()
+            )
+            updateVideoApi.enqueue(MyCallback(callBackInfo, context))
+        } catch (e: Exception) {
+            Log.e("uploadVideo", "Error uploading video", e)
+            handler.post {
+                callBackInfo.onFailure(-1, FAILURE_MEG)
+            }
+        }
+    }
+
     class MyCallback<T>(private val callBackInfo: CallBackInfo<T>, private val context: Context) :
         Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
@@ -182,6 +251,10 @@ object RetrofitUtil {
                         is UploadResponseEntity -> {
                             callBackInfo.onSuccess(responseEntity)
                         }
+
+                        is CommonResponseEntity -> {
+                            callBackInfo.onSuccess(responseEntity)
+                        }
                     }
                 } else handler.post {
                     callBackInfo.onFailure(responseCode, FAILURE_MEG)
@@ -196,18 +269,6 @@ object RetrofitUtil {
                 callBackInfo.onFailure(-1, FAILURE_MEG)
             }
         }
-    }
-
-    private fun getRequestBodyFromUri(context: Context, uri: Uri): RequestBody {
-        val contentResolver = context.contentResolver
-        val inputStream: InputStream? = contentResolver.openInputStream(uri)
-        val fileBytes = inputStream?.readBytes()
-        inputStream?.close()
-        return fileBytes!!.toRequestBody(
-            "multipart/form-data".toMediaTypeOrNull(),
-            0,
-            fileBytes.size
-        )
     }
 
     //通过Uri获取文件名

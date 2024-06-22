@@ -1,4 +1,4 @@
-package com.example.my_video_player.entities
+package com.example.my_video_player.classes
 
 import android.net.Uri
 

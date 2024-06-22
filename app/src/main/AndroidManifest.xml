@@ -21,6 +21,11 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".activities.VideoManageActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.My_video_player" />
+        <activity
             android:name=".activities.ConfigActivity"
             android:exported="false"
             android:launchMode="singleTask" />

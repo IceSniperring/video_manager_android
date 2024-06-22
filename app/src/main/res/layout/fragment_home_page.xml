@@ -1,15 +1,41 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:id="@+id/loading_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.github.ybq.android.spinkit.SpinKitView
+            style="@style/SpinKitView.FadingCircle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:SpinKit_Color="#55C8F6" />
+
+        <TextView
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在拼命加载中..."
+            android:textSize="10sp" />
+    </LinearLayout>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="25dp"
         android:background="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
         app:tabIndicator="@drawable/tab_indicator"
         app:tabIndicatorColor="#FB9AEC"
         app:tabIndicatorHeight="2dp"
@@ -22,6 +48,52 @@
         android:id="@+id/home_page_view_pager2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout" />
 
-</LinearLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/empty_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/empty_icon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/loading_failed"
+            app:layout_constraintBottom_toTopOf="@id/empty_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/empty_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="加载失败！"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/empty_icon" />
+
+        <TextView
+            android:id="@+id/retry_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:padding="10dp"
+            android:text="重新加载试试？"
+            android:textColor="#55C8F6"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/empty_icon" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
