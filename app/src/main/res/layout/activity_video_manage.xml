@@ -33,10 +33,11 @@
         android:id="@+id/video_manage_recyclerView"
         android:layout_width="match_parent"
         android:layout_marginTop="12dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/manage_title" />
+        app:layout_constraintTop_toBottomOf="@id/manage_title"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/empty_area"
