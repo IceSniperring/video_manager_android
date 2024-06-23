@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintWidth_percent="0.35"
         app:round="4dp" />
 
     <TextView
@@ -23,16 +23,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:maxLines="3"
+        android:maxLines="2"
         android:paddingStart="20dp"
         android:paddingEnd="10dp"
         android:text="标题"
-        android:textSize="14sp"
+        android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/video_poster"
         app:layout_constraintTop_toTopOf="@id/video_poster"
         app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.5" />
+        app:layout_constraintWidth_percent="0.65" />
 
 
     <TextView
@@ -50,7 +50,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/video_poster"
         app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.5" />
+        app:layout_constraintWidth_percent="0.65" />
 
     <TextView
         android:id="@+id/video_kind_label"
@@ -59,7 +59,8 @@
         android:paddingStart="20dp"
         android:paddingEnd="10dp"
         android:text="分类:"
-        android:textSize="12sp"
+        android:layout_marginBottom="6dp"
+        android:textSize="8sp"
         app:layout_constraintBottom_toTopOf="@id/video_kind"
         app:layout_constraintStart_toStartOf="@id/video_title"
         app:layout_constraintTop_toBottomOf="@id/video_title"
@@ -76,27 +77,26 @@
         android:text="vue"
         android:textAllCaps="true"
         android:textColor="#6AA9BC"
-        android:textSize="12sp"
+        android:textSize="10sp"
         app:layout_constraintBottom_toTopOf="@id/video_date"
         app:layout_constraintStart_toStartOf="@id/video_title"
         app:layout_constraintTop_toBottomOf="@id/video_kind_label"
         app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.5" />
+        app:layout_constraintWidth_percent="0.65" />
 
     <TextView
         android:id="@+id/video_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:background="@drawable/sm_delete_btn_round_bkg"
         android:clickable="true"
         android:ellipsize="end"
-        android:maxLines="3"
         android:paddingStart="12dp"
         android:paddingTop="8dp"
         android:paddingEnd="12dp"
         android:paddingBottom="8dp"
         android:text="删除"
+        android:textColor="#FF6363"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/video_poster" />
@@ -106,16 +106,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:background="@drawable/sm_confirm_round_bkg"
         android:clickable="true"
         android:ellipsize="end"
-        android:maxLines="3"
         android:paddingStart="12dp"
         android:paddingTop="8dp"
         android:paddingEnd="12dp"
         android:paddingBottom="8dp"
         android:text="编辑"
-        android:textColor="@color/black"
+        android:textColor="#55C8F6"
         android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@id/video_delete"
         app:layout_constraintTop_toBottomOf="@id/video_poster" />

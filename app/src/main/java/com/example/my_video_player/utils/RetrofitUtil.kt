@@ -14,6 +14,7 @@ import com.example.my_video_player.entities.LoginStatusEntity
 import com.example.my_video_player.entities.LoginUserEntity
 import com.example.my_video_player.entities.UploadResponseEntity
 import com.example.my_video_player.classes.UploadVideoFormData
+import com.example.my_video_player.entities.HistoryVideoItemEntity
 import com.example.my_video_player.entities.UserEntity
 import com.example.my_video_player.entities.VideoEntity
 import com.example.my_video_player.entities.VideoInfoEntity
@@ -49,12 +50,12 @@ object RetrofitUtil {
         current: Int = 1
     ) {
         val getRandomVideoApi = apiService.getHomeRandomVideo(current)
-        getRandomVideoApi.enqueue(MyCallback(callBackInfo, context))
+        getRandomVideoApi.enqueue(MyCallback(callBackInfo))
     }
 
-    fun getUserInfoById(context: Context, callBackInfo: CallBackInfo<UserEntity>, id: Long = 1) {
+    fun getUserInfoById(callBackInfo: CallBackInfo<UserEntity>, id: Long = 1) {
         val getUserInfoApi = apiService.getUserById(id)
-        getUserInfoApi.enqueue(MyCallback(callBackInfo, context))
+        getUserInfoApi.enqueue(MyCallback(callBackInfo))
     }
 
     fun getVideoByKind(
@@ -64,7 +65,36 @@ object RetrofitUtil {
         page: Int = 1
     ) {
         val getVideoByKindApi = apiService.getVideoByKind(kind, page)
-        getVideoByKindApi.enqueue(MyCallback(callBackInfo, context))
+        getVideoByKindApi.enqueue(MyCallback(callBackInfo))
+    }
+
+    fun getVideoByVid(
+        vid: Long,
+        callBackInfo: CallBackInfo<List<VideoInfoEntity>>,
+    ) {
+        val getVideoByVidApi = apiService.getVideoByVid(vid)
+        getVideoByVidApi.enqueue(object : Callback<List<VideoInfoEntity>> {
+            override fun onResponse(
+                call: Call<List<VideoInfoEntity>>,
+                response: Response<List<VideoInfoEntity>>
+            ) {
+                val responseCode = response.code()
+                if (response.isSuccessful) {
+                    val responseEntity = response.body()
+                    if (responseEntity != null) {
+                        callBackInfo.onSuccess(responseEntity)
+                    } else handler.post {
+                        callBackInfo.onFailure(responseCode, FAILURE_MEG)
+                    }
+                } else handler.post {
+                    callBackInfo.onFailure(responseCode, FAILURE_MEG)
+                }
+            }
+
+            override fun onFailure(call: Call<List<VideoInfoEntity>>, t: Throwable) {
+                callBackInfo.onFailure(-1, FAILURE_MEG)
+            }
+        })
     }
 
     fun getKind(context: Context, callBackInfo: CallBackInfo<List<String>>) {
@@ -96,7 +126,7 @@ object RetrofitUtil {
         loginUserEntity: LoginUserEntity
     ) {
         val loginApi = apiService.login(loginUserEntity)
-        loginApi.enqueue(MyCallback<LoginStatusEntity>(callBackInfo, context))
+        loginApi.enqueue(MyCallback<LoginStatusEntity>(callBackInfo))
     }
 
     fun getUserInfoByUsername(
@@ -105,7 +135,7 @@ object RetrofitUtil {
         username: String
     ) {
         val getUserInfoApi = apiService.getUserInfo(username)
-        getUserInfoApi.enqueue(MyCallback(callBackInfo, context))
+        getUserInfoApi.enqueue(MyCallback(callBackInfo))
     }
 
 
@@ -149,7 +179,7 @@ object RetrofitUtil {
                     .build()
             )
 
-            uploadVideoApi.enqueue(MyCallback(callBackInfo, context))
+            uploadVideoApi.enqueue(MyCallback(callBackInfo))
         } catch (e: Exception) {
             Log.e("uploadVideo", "Error uploading video", e)
             handler.post {
@@ -190,7 +220,7 @@ object RetrofitUtil {
         callBackInfo: CallBackInfo<CommonResponseEntity>
     ) {
         val deleteVideoByIdApi = apiService.deleteVideo(id)
-        deleteVideoByIdApi.enqueue(MyCallback(callBackInfo, context))
+        deleteVideoByIdApi.enqueue(MyCallback(callBackInfo))
     }
 
     fun updateVideo(
@@ -219,7 +249,7 @@ object RetrofitUtil {
                     )
                     .build()
             )
-            updateVideoApi.enqueue(MyCallback(callBackInfo, context))
+            updateVideoApi.enqueue(MyCallback(callBackInfo))
         } catch (e: Exception) {
             Log.e("uploadVideo", "Error uploading video", e)
             handler.post {
@@ -228,7 +258,55 @@ object RetrofitUtil {
         }
     }
 
-    class MyCallback<T>(private val callBackInfo: CallBackInfo<T>, private val context: Context) :
+    fun setHistory(
+        uid: Long,
+        vid: Long,
+        context: Context,
+        callBackInfo: CallBackInfo<Boolean>
+    ) {
+        val setHistoryApi = apiService.setHistory(uid, vid)
+        setHistoryApi.enqueue(MyCallback(callBackInfo))
+    }
+
+    fun getHistory(
+        uid: Long, context: Context,
+        callBackInfo: CallBackInfo<List<HistoryVideoItemEntity>>
+    ) {
+        val getHistoryApi = apiService.getHistory(uid)
+        getHistoryApi.enqueue(object : Callback<List<HistoryVideoItemEntity>> {
+            override fun onResponse(
+                call: Call<List<HistoryVideoItemEntity>>,
+                response: Response<List<HistoryVideoItemEntity>>
+            ) {
+                val responseCode = response.code()
+                if (response.isSuccessful) {
+                    val responseEntity = response.body()
+                    if (responseEntity != null) {
+                        callBackInfo.onSuccess(responseEntity)
+                    } else handler.post {
+                        callBackInfo.onFailure(responseCode, FAILURE_MEG)
+                    }
+                } else handler.post {
+                    callBackInfo.onFailure(responseCode, FAILURE_MEG)
+                }
+            }
+
+            override fun onFailure(call: Call<List<HistoryVideoItemEntity>>, t: Throwable) {
+                callBackInfo.onFailure(-1, FAILURE_MEG)
+            }
+        })
+    }
+
+    fun deleteHistory(
+        context: Context,
+        recordId: Long,
+        callBackInfo: CallBackInfo<CommonResponseEntity>
+    ) {
+        val deleteHistoryApi = apiService.deleteHistory(recordId)
+        deleteHistoryApi.enqueue(MyCallback(callBackInfo))
+    }
+
+    class MyCallback<T>(private val callBackInfo: CallBackInfo<T>) :
         Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
             val responseCode = response.code()
@@ -253,6 +331,10 @@ object RetrofitUtil {
                         }
 
                         is CommonResponseEntity -> {
+                            callBackInfo.onSuccess(responseEntity)
+                        }
+
+                        is Boolean -> {
                             callBackInfo.onSuccess(responseEntity)
                         }
                     }
@@ -291,5 +373,10 @@ object RetrofitUtil {
             }
         }
         return result!!
+    }
+
+    //判断类型
+    inline fun <reified T> isInstanceOf(obj: Any): Boolean {
+        return obj is T
     }
 }

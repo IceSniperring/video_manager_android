@@ -29,7 +29,7 @@ import org.greenrobot.eventbus.EventBus
 
 class EditVideoDialogFragment(
     private val id: String,
-    private val onConfirmButtonClickListener: View.OnClickListener,
+    private val videoTitle: String = "",
     private val onCloseButtonClickListener: View.OnClickListener
 ) : DialogFragment() {
     private lateinit var videoThumbnail: ImageView
@@ -59,6 +59,7 @@ class EditVideoDialogFragment(
         uploadTint = view.findViewById(R.id.upload_tint)
         val title = view.findViewById<EditText>(R.id.video_title)
         val closeBtn = view.findViewById<ImageView>(R.id.close_btn)
+        title.setText(videoTitle)
         closeBtn.setOnClickListener {
             onCloseButtonClickListener.onClick(it)
             dialog.dismiss()
@@ -99,7 +100,7 @@ class EditVideoDialogFragment(
         updateVideoFormData.postUri = selectedPosterUri
     }
 
-    fun updateVideo() {
+    private fun updateVideo() {
         val loadingDialog = LoadingDialogFragment("上传中：0%")
         loadingDialog.show(childFragmentManager, "loading_dialog")
         RetrofitUtil.updateVideo(

@@ -1,6 +1,7 @@
 package com.example.my_video_player.interfaces
 
 import com.example.my_video_player.entities.CommonResponseEntity
+import com.example.my_video_player.entities.HistoryVideoItemEntity
 import com.example.my_video_player.entities.LoginStatusEntity
 import com.example.my_video_player.entities.LoginUserEntity
 import com.example.my_video_player.entities.UploadResponseEntity
@@ -32,6 +33,11 @@ interface ApiService {
         @Query("page") page: Int
     ): Call<VideoEntity>
 
+    @GET("api/getVideoByVid")
+    fun getVideoByVid(
+        @Query("vid") vid: Long
+    ): Call<List<VideoInfoEntity>>
+
     @POST("api/login")
     fun login(
         @Body loginUserEntity: LoginUserEntity
@@ -53,4 +59,13 @@ interface ApiService {
 
     @PUT("api/updateVideoInfo")
     fun updateVideo(@Body requestBody: RequestBody): Call<CommonResponseEntity>
+
+    @POST("api/setHistory")
+    fun setHistory(@Query("uid") uid: Long, @Query("vid") vid: Long): Call<Boolean>
+
+    @GET("api/getHistory")
+    fun getHistory(@Query("uid") uid: Long): Call<List<HistoryVideoItemEntity>>
+
+    @DELETE("api/deleteHistory")
+    fun deleteHistory(@Query("id") recordId: Long): Call<CommonResponseEntity>
 }

@@ -1,5 +1,6 @@
 package com.example.my_video_player.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -9,12 +10,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -50,6 +54,8 @@ class UploadPageFragment : Fragment() {
     private lateinit var uploadProgress: ProgressBar
     private lateinit var uploadProgressArea: LinearLayout
     private lateinit var uploadProgressText: TextView
+    private lateinit var videoTitle: EditText
+    private lateinit var videoKind: EditText
     private val handler = Handler(Looper.getMainLooper())
     private val uploadVideoFormData: UploadVideoFormData = UploadVideoFormData()
 
@@ -107,8 +113,8 @@ class UploadPageFragment : Fragment() {
         uploadTint = view.findViewById(R.id.upload_tint)
         videoPoster = view.findViewById(R.id.video_poster)
         confirmBtn = view.findViewById(R.id.confirm_button)
-        val title = view.findViewById<TextView>(R.id.video_title)
-        val kind = view.findViewById<TextView>(R.id.video_kind)
+        videoTitle = view.findViewById(R.id.video_title)
+        videoKind = view.findViewById(R.id.video_kind)
         videoThumbnail.setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.setType("video/*")
@@ -127,23 +133,23 @@ class UploadPageFragment : Fragment() {
                     childFragmentManager,
                     "notice_dialog"
                 )
-            } else if (kind.text.toString().isEmpty()) {
+            } else if (videoKind.text.toString().isEmpty()) {
                 NoticeDialogFragment("warning", "警告！", "请填写视频分类") {}.show(
                     childFragmentManager,
                     "notice_dialog"
                 )
-            } else if (title.text.toString().isEmpty()) {
+            } else if (videoTitle.text.toString().isEmpty()) {
                 NoticeDialogFragment("warning", "警告！", "请填写视频标题") {}.show(
                     childFragmentManager,
                     "notice_dialog"
                 )
             } else {
-                val message = "视频名称：${title.text}\n分类：${kind.text}"
+                val message = "视频名称：${videoTitle.text}\n分类：${videoKind.text}"
                 val spannable = SpannableString(message)
-                val titleTextStart = message.indexOf(title.text.toString())
-                val titleTextEnd = titleTextStart + title.text.length
-                val kindTextStart = message.indexOf(kind.text.toString())
-                val kindTextEnd = kindTextStart + kind.text.length
+                val titleTextStart = message.indexOf(videoTitle.text.toString())
+                val titleTextEnd = titleTextStart + videoTitle.text.length
+                val kindTextStart = message.indexOf(videoKind.text.toString())
+                val kindTextEnd = kindTextStart + videoKind.text.length
                 // 设置颜色
                 spannable.setSpan(
                     ForegroundColorSpan(Color.parseColor("#55C8F6")),
@@ -158,8 +164,8 @@ class UploadPageFragment : Fragment() {
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 AlertDialogFragment("确定上传吗？", spannable, {
-                    uploadVideoFormData.title = title.text.toString()
-                    uploadVideoFormData.kind = kind.text.toString()
+                    uploadVideoFormData.title = videoTitle.text.toString()
+                    uploadVideoFormData.kind = videoKind.text.toString()
                     uploadVideoFormData.uid = MMKV.defaultMMKV().decodeLong("uid").toString() ?: ""
                     uploadVideo()
                 }, {}).show(childFragmentManager, "alert_dialog")
@@ -179,6 +185,7 @@ class UploadPageFragment : Fragment() {
         uploadTint.visibility = View.GONE
         videoPoster.visibility = View.VISIBLE
         confirmBtn.visibility = View.VISIBLE
+        videoTitle.setText(getFileNameFromUri(requireContext(), selectedVideoUri))
         uploadVideoFormData.videoUri = selectedVideoUri
     }
 
@@ -208,6 +215,8 @@ class UploadPageFragment : Fragment() {
         confirmBtn.isEnabled = false
         confirmBtn.alpha = 0.5f
         confirmBtn.text = "上传中"
+        videoKind.isEnabled = false
+        videoTitle.isEnabled = false
         val badge = bottomNavigationView.getOrCreateBadge(R.id.upload_page)
         badge.setTextAppearance(R.style.BadgeTextAppearance)
         badge.text = "上传中"
@@ -238,6 +247,16 @@ class UploadPageFragment : Fragment() {
                             confirmBtn.isEnabled = true
                             confirmBtn.alpha = 1f
                             confirmBtn.text = "确认提交"
+                            videoThumbnail.setImageDrawable(null)
+                            uploadTint.visibility = View.VISIBLE
+                            videoKind.setText("")
+                            videoTitle.setText("")
+                            videoKind.isEnabled = true
+                            videoTitle.isEnabled = true
+                            videoPoster.visibility = View.INVISIBLE
+                            confirmBtn.visibility = View.INVISIBLE
+                            uploadVideoFormData.videoUri = Uri.EMPTY
+                            uploadVideoFormData.postUri = Uri.EMPTY
                         }
                         bottomNavigationView.removeBadge(R.id.upload_page)
                     }
@@ -254,4 +273,26 @@ class UploadPageFragment : Fragment() {
         return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }
 
+    @SuppressLint("Range")
+    private fun getFileNameFromUri(context: Context, uri: Uri): String {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor = context.contentResolver.query(uri, null, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    result = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result!!.lastIndexOf('/')
+            if (cut != -1) {
+                result = result!!.substring(cut + 1)
+            }
+        }
+        // 去除文件后缀名
+        result = result!!.substringBeforeLast('.')
+        return result!!
+    }
 }

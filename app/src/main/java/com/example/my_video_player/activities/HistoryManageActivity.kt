@@ -14,23 +14,32 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.my_video_player.R
-import com.example.my_video_player.adapters.VideoManagerAdapter
-import com.example.my_video_player.entities.VideoInfoEntity
+import com.example.my_video_player.adapters.HistoryManageAdapter
+import com.example.my_video_player.entities.HistoryVideoItemEntity
+import com.example.my_video_player.eventsEntities.HistoryManageListEmptyEvent
 import com.example.my_video_player.eventsEntities.VideoManageListEmptyEvent
-import com.example.my_video_player.eventsEntities.ManuscriptRefreshEvent
 import com.example.my_video_player.fragments.AlertDialogFragment
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
+import com.scwang.smart.refresh.layout.SmartRefreshLayout
+import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-class VideoManageActivity : AppCompatActivity() {
+class HistoryManageActivity : AppCompatActivity() {
+    private lateinit var refreshLayout: SmartRefreshLayout
+
+    override fun onResume() {
+        super.onResume()
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_video_manage)
+        setContentView(R.layout.activity_history_manage)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -43,38 +52,49 @@ class VideoManageActivity : AppCompatActivity() {
         EventBus.getDefault().register(this)
         val uid = MMKV.defaultMMKV().decodeLong("uid")
         if (uid == 0L) {
-            AlertDialogFragment("要登陆吗？", SpannableString("请先登录后再管理稿件哦！"), {
-                val intent = Intent(this@VideoManageActivity, LoginPageActivity::class.java)
+            AlertDialogFragment("要登陆吗？", SpannableString("请先登录后再查看历史哦！"), {
+                val intent = Intent(this@HistoryManageActivity, LoginPageActivity::class.java)
                 startActivity(intent)
             }, {
                 finish()
             }).show(supportFragmentManager, "login_dialog")
         } else {
-            initView()
+            refresh()
+        }
+
+        refreshLayout = findViewById(R.id.refresh_layout)
+
+        refreshLayout.setOnRefreshListener {
+            refresh()
         }
     }
 
-    private fun initView() {
-        val recyclerView = findViewById<RecyclerView>(R.id.video_manage_recyclerView)
+    private fun refresh() {
+        val recyclerView = findViewById<RecyclerView>(R.id.history_manage_recyclerview)
         recyclerView.layoutManager = LinearLayoutManager(this)
         val uid = MMKV.defaultMMKV().decodeLong("uid")
-        RetrofitUtil.getVideoByUid(
+        RetrofitUtil.getHistory(
             uid,
-            object : CallBackInfo<List<VideoInfoEntity>> {
-                override fun onSuccess(data: List<VideoInfoEntity>) {
-                    val videoManageAdapter =
-                        VideoManagerAdapter(data.toMutableList(), this@VideoManageActivity)
-                    recyclerView.adapter = videoManageAdapter
+            this@HistoryManageActivity,
+            object : CallBackInfo<List<HistoryVideoItemEntity>> {
+                override fun onSuccess(data: List<HistoryVideoItemEntity>) {
+                    val historyManageAdapter =
+                        HistoryManageAdapter(data.toMutableList(), this@HistoryManageActivity)
+                    recyclerView.adapter = historyManageAdapter
                     if (data.isNotEmpty()) {
                         val emptyArea = findViewById<ConstraintLayout>(R.id.empty_area)
                         emptyArea.visibility = View.GONE
                     } else {
-                        EventBus.getDefault().postSticky(VideoManageListEmptyEvent())
+                        EventBus.getDefault().postSticky(HistoryManageListEmptyEvent())
+                    }
+
+                    if (refreshLayout.isRefreshing) {
+                        refreshLayout.finishRefresh()
                     }
                 }
 
                 override fun onFailure(code: Int, meg: String) {
-                    Toast.makeText(this@VideoManageActivity, "获取稿件失败", Toast.LENGTH_SHORT)
+                    Toast.makeText(this@HistoryManageActivity, "获取历史失败", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
@@ -82,7 +102,7 @@ class VideoManageActivity : AppCompatActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    fun onListEmptyEvent(event: VideoManageListEmptyEvent) {
+    fun onListEmptyEvent(event: HistoryManageListEmptyEvent) {
         val emptyArea = findViewById<ConstraintLayout>(R.id.empty_area)
         emptyArea.alpha = 0f
         emptyArea.visibility = View.VISIBLE
@@ -90,11 +110,6 @@ class VideoManageActivity : AppCompatActivity() {
             .alpha(1f)
             .setDuration(500)
             .start()
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    fun onManuscriptRefreshEvent(event: ManuscriptRefreshEvent) {
-        initView()
     }
 
     override fun onDestroy() {

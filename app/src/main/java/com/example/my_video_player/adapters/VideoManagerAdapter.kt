@@ -17,7 +17,7 @@ import com.example.my_video_player.activities.PlayPageActivity
 import com.example.my_video_player.entities.CommonResponseEntity
 import com.example.my_video_player.entities.VideoInfoEntity
 import com.example.my_video_player.eventsEntities.KindRefreshEvent
-import com.example.my_video_player.eventsEntities.ListEmptyEvent
+import com.example.my_video_player.eventsEntities.VideoManageListEmptyEvent
 import com.example.my_video_player.eventsEntities.VideoRefreshEvent
 import com.example.my_video_player.fragments.AlertDialogFragment
 import com.example.my_video_player.fragments.EditVideoDialogFragment
@@ -55,6 +55,7 @@ class VideoManagerAdapter(
             )
             bundle.putString("authorName", MMKV.defaultMMKV().decodeString("username"))
             bundle.putString("uploadDate", item.uploadDate)
+            bundle.putLong("vid", item.id)
             intent.putExtras(bundle)
             context.startActivity(intent)
         }
@@ -79,7 +80,7 @@ class VideoManagerAdapter(
                                 notifyItemRemoved(holder.absoluteAdapterPosition)
                             }
                             if (videoInfoEntityList.isEmpty()) {
-                                EventBus.getDefault().postSticky(ListEmptyEvent())
+                                EventBus.getDefault().postSticky(VideoManageListEmptyEvent())
                             }
                             NoticeDialogFragment(
                                 "success",
@@ -100,7 +101,7 @@ class VideoManagerAdapter(
 
         val videoEditor = holder.getView<TextView>(R.id.video_editor)
         videoEditor.setOnClickListener {
-            EditVideoDialogFragment(item.id.toString(), {}, {}).show(
+            EditVideoDialogFragment(item.id.toString(), item.title, {}).show(
                 activity.supportFragmentManager,
                 "edit_dialog"
             )

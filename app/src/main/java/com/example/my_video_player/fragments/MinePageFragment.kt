@@ -14,8 +14,10 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.my_video_player.R
 import com.example.my_video_player.activities.ConfigActivity
+import com.example.my_video_player.activities.HistoryManageActivity
 import com.example.my_video_player.activities.LoginPageActivity
 import com.example.my_video_player.activities.VideoManageActivity
+import com.example.my_video_player.adapters.HistoryManageAdapter
 import com.example.my_video_player.eventsEntities.LoginEventEntity
 import com.example.my_video_player.eventsEntities.LogoutEventEntity
 import com.tencent.mmkv.MMKV
@@ -64,6 +66,12 @@ class MinePageFragment : Fragment() {
         val manuscript = view.findViewById<ImageView>(R.id.manuscript_icon)
         manuscript.setOnClickListener {
             val intent = Intent(requireContext(), VideoManageActivity::class.java)
+            startActivity(intent)
+        }
+
+        val history = view.findViewById<ImageView>(R.id.history_icon)
+        history.setOnClickListener {
+            val intent = Intent(requireContext(), HistoryManageActivity::class.java)
             startActivity(intent)
         }
         return view

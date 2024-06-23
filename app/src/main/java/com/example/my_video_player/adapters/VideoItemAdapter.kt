@@ -41,6 +41,7 @@ class VideoItemAdapter(videoItemList: MutableList<VideoItemEntity>) :
             bundle.putString("authorImage", "$BASE_URL${item.user.avatarPath}")
             bundle.putString("authorName", item.user.username)
             bundle.putString("uploadDate", item.uploadDate)
+            bundle.putLong("vid", item.id)
             intent.putExtras(bundle)
             context.startActivity(intent)
         }

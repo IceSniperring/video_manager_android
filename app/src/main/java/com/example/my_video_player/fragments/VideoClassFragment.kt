@@ -99,7 +99,6 @@ class VideoClassFragment : Fragment() {
                     )
                     videoInfoAdapter.notifyItemInserted(videoItemEntityList.size)
                     RetrofitUtil.getUserInfoById(
-                        requireContext(),
                         object : CallBackInfo<UserEntity> {
                             override fun onSuccess(data: UserEntity) {
                                 videoItemEntityList[index] = VideoItemEntity(
@@ -149,7 +148,6 @@ class VideoClassFragment : Fragment() {
                         )
                         videoInfoAdapter.notifyItemInserted(videoItemEntityList.size)
                         RetrofitUtil.getUserInfoById(
-                            requireContext(),
                             object : CallBackInfo<UserEntity> {
                                 override fun onSuccess(data: UserEntity) {
                                     videoItemEntityList[index + nowSize] = VideoItemEntity(

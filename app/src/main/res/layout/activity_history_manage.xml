@@ -5,38 +5,29 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.VideoManageActivity">
+    tools:context=".activities.HistoryManageActivity">
 
     <ImageView
         android:id="@+id/back_button"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="16dp"
         android:src="@drawable/back_white"
-        app:layout_constraintBottom_toBottomOf="@id/manage_title"
+        app:layout_constraintBottom_toBottomOf="@id/history_title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/manage_title" />
+        app:layout_constraintTop_toTopOf="@id/history_title" />
 
 
     <TextView
-        android:id="@+id/manage_title"
+        android:id="@+id/history_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="稿件管理"
+        android:text="历史管理"
         android:textColor="@color/white"
         android:textSize="14sp"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/video_manage_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_marginTop="12dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/manage_title" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/empty_area"
@@ -67,5 +58,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/empty_icon" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/history_title">
+
+        <com.scwang.smart.refresh.header.MaterialHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/history_manage_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" />
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

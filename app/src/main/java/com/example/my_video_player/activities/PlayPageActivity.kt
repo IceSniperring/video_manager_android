@@ -297,6 +297,24 @@ class PlayPageActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        val bundle = intent.extras
+        val uid = MMKV.defaultMMKV().decodeLong("uid")
+        val vid = bundle!!.getLong("vid")
+        if (uid != 0L) {
+            RetrofitUtil.setHistory(
+                uid,
+                vid,
+                this@PlayPageActivity,
+                object : CallBackInfo<Boolean> {
+                    override fun onSuccess(data: Boolean) {
+                        Log.i("history", "record history with uid: $uid, vid: $vid")
+                    }
+
+                    override fun onFailure(code: Int, meg: String) {
+                        Log.e("history", "can not record history: code:$code, reason: $meg")
+                    }
+                })
+        }
     }
 
     //滑动手势
@@ -386,7 +404,6 @@ class PlayPageActivity : AppCompatActivity() {
                     )
                     videoInfoAdapter.notifyItemInserted(videoItemEntityList.size)
                     RetrofitUtil.getUserInfoById(
-                        this@PlayPageActivity,
                         object : CallBackInfo<UserEntity> {
                             override fun onSuccess(data: UserEntity) {
                                 videoItemEntityList[index + nowSize] = VideoItemEntity(
@@ -395,7 +412,12 @@ class PlayPageActivity : AppCompatActivity() {
                                     "$BASE_URL${it.postPath}",
                                     "$BASE_URL${it.filePath}",
                                     it.uploadDate,
-                                    UserEntity(it.uid, data.username, data.avatarPath, data.email)
+                                    UserEntity(
+                                        it.uid,
+                                        data.username,
+                                        data.avatarPath,
+                                        data.email
+                                    )
                                 )
                                 videoInfoAdapter.notifyItemChanged(index + nowSize)
                             }

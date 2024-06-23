@@ -3,8 +3,10 @@ package com.example.my_video_player.adapters
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
+import androidx.annotation.OptIn
 import androidx.constraintlayout.utils.widget.ImageFilterView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.media3.common.util.UnstableApi
 import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -20,6 +22,8 @@ class PlayerPageVideoItemAdapter(videoItemList: MutableList<VideoItemEntity>) :
     ) {
     private val resourceAddress = MMKV.defaultMMKV().decodeString("resourceAddress")
     private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
+
+    @OptIn(UnstableApi::class)
     override fun convert(holder: BaseViewHolder, item: VideoItemEntity) {
         val poster = holder.getView<ImageFilterView>(R.id.poster)
         Glide.with(context).load(item.postPath).into(poster)
@@ -37,6 +41,7 @@ class PlayerPageVideoItemAdapter(videoItemList: MutableList<VideoItemEntity>) :
             bundle.putString("authorImage", "$BASE_URL${item.user.avatarPath}")
             bundle.putString("authorName", item.user.username)
             bundle.putString("uploadDate", item.uploadDate)
+            bundle.putLong("vid", item.id)
             intent.putExtras(bundle)
             context.startActivity(intent)
         }
