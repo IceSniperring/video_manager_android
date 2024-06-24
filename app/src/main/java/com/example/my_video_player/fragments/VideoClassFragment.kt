@@ -2,6 +2,8 @@ package com.example.my_video_player.fragments
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -41,6 +43,9 @@ class VideoClassFragment : Fragment() {
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
     private lateinit var videoInfoAdapter: VideoItemAdapter
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var refreshHeader: ClassicsHeader
+    private lateinit var refreshFooter: ClassicsFooter
     private val loadDrawAbles: List<Int> = listOf(
         R.drawable.pokeball,
         R.drawable.super_pokeball,
@@ -87,16 +92,17 @@ class VideoClassFragment : Fragment() {
         videoClassRecyclerView.adapter = videoInfoAdapter
 
         smartRefreshLayout = view.findViewById(R.id.class_refresh)
-        val refreshHeader = smartRefreshLayout.refreshHeader as ClassicsHeader
-        val refreshFooter = smartRefreshLayout.refreshFooter as ClassicsFooter
+        refreshHeader = smartRefreshLayout.refreshHeader as ClassicsHeader
+        refreshHeader.setProgressResource(loadDrawAbles.random())
+        refreshFooter = smartRefreshLayout.refreshFooter as ClassicsFooter
+        refreshFooter.setProgressResource(loadDrawAbles.random())
         smartRefreshLayout.setOnRefreshListener {
-            refreshHeader.setProgressResource(loadDrawAbles.random())
             refresh()
         }
         smartRefreshLayout.setOnLoadMoreListener {
-            refreshFooter.setProgressResource(loadDrawAbles.random())
             loadMore()
         }
+
         smartRefreshLayout.autoRefresh(0, 100, 0f, false)
     }
 
@@ -159,6 +165,10 @@ class VideoClassFragment : Fragment() {
                         )
                     }
                     smartRefreshLayout.finishRefresh()
+                    smartRefreshLayout.setEnableLoadMore(true)
+                    handler.postDelayed({
+                        refreshHeader.setProgressResource(loadDrawAbles.random())
+                    }, 300)
                     current++
                 }
 
@@ -216,6 +226,9 @@ class VideoClassFragment : Fragment() {
                         }
                         current++
                         smartRefreshLayout.finishLoadMore()
+                        handler.postDelayed({
+                            refreshFooter.setProgressResource(loadDrawAbles.random())
+                        }, 300)
                     } else {
                         Toast.makeText(requireContext(), "无更多视频", Toast.LENGTH_SHORT).show()
                         smartRefreshLayout.finishLoadMore()

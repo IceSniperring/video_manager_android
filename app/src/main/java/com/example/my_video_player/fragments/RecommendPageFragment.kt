@@ -1,6 +1,8 @@
 package com.example.my_video_player.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -35,8 +37,11 @@ class RecommendPageFragment : Fragment() {
     private val BASE_URL = resourceAddress ?: "http://192.168.31.200:10003"
     private var current = 1
     private lateinit var smartRefreshLayout: SmartRefreshLayout
+    private lateinit var refreshHeader: ClassicsHeader
+    private lateinit var refreshFooter: ClassicsFooter
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
     private lateinit var videoInfoAdapter: VideoItemAdapter
+    private val handler = Handler(Looper.getMainLooper())
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private val loadDrawAbles: List<Int> = listOf(
         R.drawable.pokeball,
@@ -74,14 +79,14 @@ class RecommendPageFragment : Fragment() {
         videoInfoRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         videoInfoRecyclerView.adapter = videoInfoAdapter
         smartRefreshLayout = view.findViewById(R.id.refresh)
-        val refreshHeader = smartRefreshLayout.refreshHeader as ClassicsHeader
-        val refreshFooter = smartRefreshLayout.refreshFooter as ClassicsFooter
+        refreshHeader = smartRefreshLayout.refreshHeader as ClassicsHeader
+        refreshHeader.setProgressResource(loadDrawAbles.random())
+        refreshFooter = smartRefreshLayout.refreshFooter as ClassicsFooter
+        refreshFooter.setProgressResource(loadDrawAbles.random())
         smartRefreshLayout.setOnRefreshListener {
-            refreshHeader.setProgressResource(loadDrawAbles.random())
             refresh()
         }
         smartRefreshLayout.setOnLoadMoreListener {
-            refreshFooter.setProgressResource(loadDrawAbles.random())
             loadMore()
         }
         smartRefreshLayout.autoRefresh(0, 100, 0f, false)
@@ -140,6 +145,9 @@ class RecommendPageFragment : Fragment() {
                         )
                     }
                     smartRefreshLayout.finishRefresh()
+                    handler.postDelayed({
+                        refreshHeader.setProgressResource(loadDrawAbles.random())
+                    }, 300)
                     current++
                 }
 
@@ -196,6 +204,9 @@ class RecommendPageFragment : Fragment() {
                         )
                     }
                     smartRefreshLayout.finishLoadMore()
+                    handler.postDelayed({
+                        refreshFooter.setProgressResource(loadDrawAbles.random())
+                    }, 300)
                 }
 
                 override fun onFailure(code: Int, msg: String) {}
