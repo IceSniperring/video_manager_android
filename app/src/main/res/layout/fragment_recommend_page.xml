@@ -12,7 +12,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.scwang.smart.refresh.header.MaterialHeader
+        <com.scwang.smart.refresh.header.ClassicsHeader
+            app:srlPrimaryColor="#0055C8F6"
+            app:srlEnableLastTime="false"
+            app:srlDrawableProgress="@drawable/pokeball"
+            app:srlScrollableWhenRefreshing="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -24,7 +28,8 @@
 
         <com.scwang.smart.refresh.footer.ClassicsFooter
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:srlDrawableProgress="@drawable/high_pokeball" />
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

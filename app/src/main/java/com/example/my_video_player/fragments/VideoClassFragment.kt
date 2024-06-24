@@ -1,5 +1,6 @@
 package com.example.my_video_player.fragments
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -19,8 +20,15 @@ import com.example.my_video_player.eventsEntities.KindRefreshEvent
 import com.example.my_video_player.eventsEntities.VideoRefreshEvent
 import com.example.my_video_player.interfaces.CallBackInfo
 import com.example.my_video_player.utils.RetrofitUtil
+import com.scwang.smart.refresh.footer.ClassicsFooter
+import com.scwang.smart.refresh.header.ClassicsHeader
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -32,6 +40,13 @@ class VideoClassFragment : Fragment() {
     private lateinit var smartRefreshLayout: SmartRefreshLayout
     private val videoItemEntityList: MutableList<VideoItemEntity> = mutableListOf()
     private lateinit var videoInfoAdapter: VideoItemAdapter
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val loadDrawAbles: List<Int> = listOf(
+        R.drawable.pokeball,
+        R.drawable.super_pokeball,
+        R.drawable.high_pokeball,
+        R.drawable.master_pokeball
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,69 +87,39 @@ class VideoClassFragment : Fragment() {
         videoClassRecyclerView.adapter = videoInfoAdapter
 
         smartRefreshLayout = view.findViewById(R.id.class_refresh)
-        smartRefreshLayout.setOnRefreshListener { refresh() }
-        smartRefreshLayout.setOnLoadMoreListener { loadMore() }
+        val refreshHeader = smartRefreshLayout.refreshHeader as ClassicsHeader
+        val refreshFooter = smartRefreshLayout.refreshFooter as ClassicsFooter
+        smartRefreshLayout.setOnRefreshListener {
+            refreshHeader.setProgressResource(loadDrawAbles.random())
+            refresh()
+        }
+        smartRefreshLayout.setOnLoadMoreListener {
+            refreshFooter.setProgressResource(loadDrawAbles.random())
+            loadMore()
+        }
+        smartRefreshLayout.autoRefresh(0, 100, 0f, false)
+    }
 
-        refresh()
+    override fun onResume() {
+        super.onResume()
+        if (videoItemEntityList.isEmpty())
+            smartRefreshLayout.autoRefresh(0, 100, 0f, false)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        smartRefreshLayout.finishRefresh()
     }
 
     private fun refresh() {
-        RetrofitUtil.getVideoByKind(requireContext(), object :
-            CallBackInfo<VideoEntity> {
-            override fun onSuccess(data: VideoEntity) {
-                EventBus.getDefault().postSticky(KindRefreshEvent())
-                val records = data.records
-                videoItemEntityList.clear()
-                videoInfoAdapter.notifyDataSetChanged()
-                records.forEachIndexed { index, it ->
-                    videoItemEntityList.add(
-                        VideoItemEntity(
-                            it.id,
-                            it.title,
-                            "$BASE_URL${it.postPath}",
-                            "$BASE_URL${it.filePath}",
-                            it.uploadDate,
-                            UserEntity(1, "", "", "")
-                        )
-                    )
-                    videoInfoAdapter.notifyItemInserted(videoItemEntityList.size)
-                    RetrofitUtil.getUserInfoById(
-                        object : CallBackInfo<UserEntity> {
-                            override fun onSuccess(data: UserEntity) {
-                                videoItemEntityList[index] = VideoItemEntity(
-                                    it.id,
-                                    it.title,
-                                    "$BASE_URL${it.postPath}",
-                                    "$BASE_URL${it.filePath}",
-                                    it.uploadDate,
-                                    UserEntity(it.uid, data.username, data.avatarPath, data.email)
-                                )
-                                videoInfoAdapter.notifyItemChanged(index)
-                            }
-
-                            override fun onFailure(code: Int, meg: String) {
-
-                            }
-                        },
-                        it.uid,
-                    )
-                }
-                smartRefreshLayout.finishRefresh()
-                current++
-            }
-
-            override fun onFailure(code: Int, msg: String) {}
-        }, videoClass, 1)
-        current = 1
-    }
-
-    private fun loadMore() {
-        RetrofitUtil.getVideoByKind(requireContext(), object :
-            CallBackInfo<VideoEntity> {
-            override fun onSuccess(data: VideoEntity) {
-                if (current <= data.pages) {
+        coroutineScope.launch {
+            RetrofitUtil.getVideoByKind(requireContext(), object :
+                CallBackInfo<VideoEntity> {
+                override fun onSuccess(data: VideoEntity) {
+                    EventBus.getDefault().postSticky(KindRefreshEvent())
                     val records = data.records
-                    val nowSize = videoItemEntityList.size
+                    videoItemEntityList.clear()
+                    videoInfoAdapter.notifyDataSetChanged()
                     records.forEachIndexed { index, it ->
                         videoItemEntityList.add(
                             VideoItemEntity(
@@ -150,7 +135,7 @@ class VideoClassFragment : Fragment() {
                         RetrofitUtil.getUserInfoById(
                             object : CallBackInfo<UserEntity> {
                                 override fun onSuccess(data: UserEntity) {
-                                    videoItemEntityList[index + nowSize] = VideoItemEntity(
+                                    videoItemEntityList[index] = VideoItemEntity(
                                         it.id,
                                         it.title,
                                         "$BASE_URL${it.postPath}",
@@ -163,7 +148,7 @@ class VideoClassFragment : Fragment() {
                                             data.email
                                         )
                                     )
-                                    videoInfoAdapter.notifyItemChanged(index + nowSize)
+                                    videoInfoAdapter.notifyItemChanged(index)
                                 }
 
                                 override fun onFailure(code: Int, meg: String) {
@@ -173,16 +158,74 @@ class VideoClassFragment : Fragment() {
                             it.uid,
                         )
                     }
+                    smartRefreshLayout.finishRefresh()
                     current++
-                    smartRefreshLayout.finishLoadMore()
-                } else {
-                    Toast.makeText(requireContext(), "无更多视频", Toast.LENGTH_SHORT).show()
-                    smartRefreshLayout.finishLoadMore()
                 }
-            }
 
-            override fun onFailure(code: Int, msg: String) {}
-        }, videoClass, current)
+                override fun onFailure(code: Int, msg: String) {}
+            }, videoClass, 1)
+            current = 1
+        }
+    }
+
+    private fun loadMore() {
+        coroutineScope.launch {
+            RetrofitUtil.getVideoByKind(requireContext(), object :
+                CallBackInfo<VideoEntity> {
+                override fun onSuccess(data: VideoEntity) {
+                    if (current <= data.pages) {
+                        val records = data.records
+                        val nowSize = videoItemEntityList.size
+                        records.forEachIndexed { index, it ->
+                            videoItemEntityList.add(
+                                VideoItemEntity(
+                                    it.id,
+                                    it.title,
+                                    "$BASE_URL${it.postPath}",
+                                    "$BASE_URL${it.filePath}",
+                                    it.uploadDate,
+                                    UserEntity(1, "", "", "")
+                                )
+                            )
+                            videoInfoAdapter.notifyItemInserted(videoItemEntityList.size)
+                            RetrofitUtil.getUserInfoById(
+                                object : CallBackInfo<UserEntity> {
+                                    override fun onSuccess(data: UserEntity) {
+                                        videoItemEntityList[index + nowSize] = VideoItemEntity(
+                                            it.id,
+                                            it.title,
+                                            "$BASE_URL${it.postPath}",
+                                            "$BASE_URL${it.filePath}",
+                                            it.uploadDate,
+                                            UserEntity(
+                                                it.uid,
+                                                data.username,
+                                                data.avatarPath,
+                                                data.email
+                                            )
+                                        )
+                                        videoInfoAdapter.notifyItemChanged(index + nowSize)
+                                    }
+
+                                    override fun onFailure(code: Int, meg: String) {
+
+                                    }
+                                },
+                                it.uid,
+                            )
+                        }
+                        current++
+                        smartRefreshLayout.finishLoadMore()
+                    } else {
+                        Toast.makeText(requireContext(), "无更多视频", Toast.LENGTH_SHORT).show()
+                        smartRefreshLayout.finishLoadMore()
+                        smartRefreshLayout.setEnableLoadMore(false)
+                    }
+                }
+
+                override fun onFailure(code: Int, msg: String) {}
+            }, videoClass, current)
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)

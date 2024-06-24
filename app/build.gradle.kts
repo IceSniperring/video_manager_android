@@ -71,8 +71,11 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.0.0")                 //必须 1.0.0 以上
 
     implementation("io.github.scwang90:refresh-layout-kernel:2.1.0")      //核心必须依赖
+    implementation("io.github.scwang90:refresh-header-classics:2.1.0")    //经典刷新头
     implementation("io.github.scwang90:refresh-header-material:2.1.0")    //谷歌刷新头
     implementation("io.github.scwang90:refresh-footer-classics:2.1.0")    //经典加载
+    implementation("io.github.scwang90:refresh-header-radar:2.1.0")     //雷达刷新头
+    implementation("io.github.scwang90:refresh-header-falsify:2.1.0")     //虚拟刷新头
 
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 
@@ -81,7 +84,7 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.3.1")
 
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
-    implementation ("com.github.centerzx:ShapeBlurView:1.0.5")
+    implementation("com.github.centerzx:ShapeBlurView:1.0.5")
 
-    implementation ("com.github.ybq:Android-SpinKit:1.4.0")
+    implementation("com.github.ybq:Android-SpinKit:1.4.0")
 }

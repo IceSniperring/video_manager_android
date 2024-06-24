@@ -249,6 +249,7 @@ class PlayPageActivity : AppCompatActivity() {
         smartRefreshLayout.setOnLoadMoreListener {
             loadMore()
         }
+        smartRefreshLayout.setEnableRefresh(false)
         loadMore()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
