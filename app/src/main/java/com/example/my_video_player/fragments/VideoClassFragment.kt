@@ -158,7 +158,7 @@ class VideoClassFragment : Fragment() {
                                 }
 
                                 override fun onFailure(code: Int, meg: String) {
-
+                                    Log.d("VideoClassFragment", "获取用户信息失败")
                                 }
                             },
                             it.uid,
@@ -172,7 +172,12 @@ class VideoClassFragment : Fragment() {
                     current++
                 }
 
-                override fun onFailure(code: Int, msg: String) {}
+                override fun onFailure(code: Int, msg: String) {
+                    smartRefreshLayout.finishRefresh(false)
+                    handler.postDelayed({
+                        refreshHeader.setProgressResource(loadDrawAbles.random())
+                    }, 300)
+                }
             }, videoClass, 1)
             current = 1
         }
@@ -218,7 +223,7 @@ class VideoClassFragment : Fragment() {
                                     }
 
                                     override fun onFailure(code: Int, meg: String) {
-
+                                        Log.d("VideoClassFragment", "获取用户信息失败")
                                     }
                                 },
                                 it.uid,
@@ -236,7 +241,13 @@ class VideoClassFragment : Fragment() {
                     }
                 }
 
-                override fun onFailure(code: Int, msg: String) {}
+                override fun onFailure(code: Int, meg: String) {
+                    smartRefreshLayout.finishLoadMore(false)
+                    handler.postDelayed({
+                        refreshHeader.setProgressResource(loadDrawAbles.random())
+                    }, 300)
+
+                }
             }, videoClass, current)
         }
     }

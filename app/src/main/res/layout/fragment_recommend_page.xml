@@ -13,6 +13,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.scwang.smart.refresh.header.ClassicsHeader
+            app:srlTextFailed="刷新失败，请检查网络！"
             app:srlPrimaryColor="#0055C8F6"
             app:srlEnableLastTime="false"
             app:srlDrawableProgress="@drawable/pokeball"
@@ -27,6 +28,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.scwang.smart.refresh.footer.ClassicsFooter
+            app:srlTextFailed="加载失败，请检查网络！"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:srlDrawableProgress="@drawable/high_pokeball" />

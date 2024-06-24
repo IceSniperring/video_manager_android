@@ -13,6 +13,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.scwang.smart.refresh.header.ClassicsHeader
+            app:srlTextFailed="刷新失败，请检查网络！"
             android:id="@+id/class_refresh_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,6 +38,7 @@
 
 
         <com.scwang.smart.refresh.footer.ClassicsFooter
+            app:srlTextFailed="加载失败，请检查网络！"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:srlDrawableProgress="@drawable/high_pokeball" />
